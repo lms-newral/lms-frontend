@@ -1,5 +1,5 @@
 type User = {
-  _id: string;
+  id: string;
   email: string;
   name: string;
   username: string;
@@ -15,6 +15,10 @@ interface UserState {
   user: User | null;
   isAuthenticated: boolean;
   accessToken: string | null;
+  selectedCourse: SelectedCourse | null;
+}
+interface SelectedCourse {
+  courseId: string;
 }
 
-export type { UserState, User };
+export type { UserState, User, SelectedCourse };

@@ -1,12 +1,11 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/slices/userSlice";
+import { setUser, setCourse } from "@/store/slices/userSlice";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header/Header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/Sidebar/AppSidebar";
 import DashboardHeader from "@/components/Dashboard/DashboardHeader";
 
@@ -14,12 +13,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const path = usePathname();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
+  const params = useParams();
 
   useEffect(() => {
     const refreshToken = async () => {
       const token = localStorage.getItem("refreshToken");
+      const storedCourseId = localStorage.getItem("courseId");
+
       if (!token) {
-        setIsLoading(false); // Fixed: should be false when no token
+        setIsLoading(false);
         return;
       }
 
@@ -28,23 +30,51 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}auth/refresh`,
           { refreshToken: token }
         );
-        localStorage.setItem("refreshToken", response.data.refreshToken);
+
+        // Set user first
         dispatch(
           setUser({
             accessToken: response.data.accessToken,
             user: response.data.user,
           })
         );
+
+        // add all the routes in the sidebar here like attachments, notes, etc when you build them
+        if (path === "/Dashboard" || path === "/Classes") {
+          let courseIdToSet = storedCourseId;
+
+          if (!storedCourseId) {
+            try {
+              const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${response.data.user.id}`;
+              const courseResponse = await axios.get(url);
+
+              if (courseResponse.data && courseResponse.data.length > 0) {
+                courseIdToSet = courseResponse.data[0].course.id;
+                localStorage.setItem("courseId", courseIdToSet || "");
+              }
+            } catch (courseError) {
+              console.error("Error fetching courses:", courseError);
+            }
+          }
+
+          // Set course if we have one
+          if (courseIdToSet) {
+            dispatch(setCourse(courseIdToSet));
+          }
+        }
+
+        localStorage.setItem("refreshToken", response.data.refreshToken);
       } catch (error) {
         console.error("Refresh token error:", error);
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("courseId");
       } finally {
-        setIsLoading(false); // Fixed: should be false when done loading
+        setIsLoading(false);
       }
     };
 
     refreshToken();
-  }, [dispatch]);
+  }, [dispatch, path]);
 
   // Show loading spinner while authenticating
   if (isLoading) {
@@ -65,7 +95,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (path === "/Dashboard" || path === "/Courses") {
+  if (path === "/Dashboard" || path === "/Courses" || path === "/Classes") {
     return (
       <div className="min-h-screen flex w-full">
         <AppSidebar />

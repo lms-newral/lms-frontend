@@ -25,9 +25,9 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="text-2xl font-bold text-gray-900">
+        <Link href={"/"} className="text-2xl font-bold text-gray-900">
           lms<span className="text-blue-600">.</span>
-        </div>
+        </Link>
 
         <nav className="hidden md:flex space-x-8">
           <a

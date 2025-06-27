@@ -11,7 +11,7 @@ export default function CourseCard(props: CourseCardProps) {
       style={{ backgroundImage: `url(${props.thumbnailurl})` }}
     >
       <div className="w-full bg-blue-900/30 backdrop-blur-md p-3 rounded-b-lg">
-        <p className="text-white font-semibold text-md">{props.title}Title</p>
+        <p className="text-white font-semibold text-md">{props.title}</p>
         <p className="text-gray-200 text-sm">{props.description}</p>
       </div>
     </div>
