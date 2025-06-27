@@ -16,7 +16,6 @@ const Header = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const headerRef = useRef<HTMLElement | null>(null);
-
   const [isOpen, setIsOpen] = useState(false);
 
   const isAuthenticated = useSelector(
@@ -47,31 +46,37 @@ const Header = () => {
         ref={headerRef}
         className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50"
       >
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+          <Link
+            href="/"
+            className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900"
+          >
             lms<span className="text-blue-600">.</span>
-          </div>
-          <nav className="hidden md:flex gap-6 text-sm sm:text-base lg:text-lg">
+          </Link>
+
+          <nav className="hidden md:flex gap-4 md:gap-6 text-sm md:text-base lg:text-lg">
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition">Pricing</a>
             <a href="#about" className="text-gray-600 hover:text-blue-600 transition">About</a>
             <a href="#contact" className="text-gray-600 hover:text-blue-600 transition">Contact</a>
           </nav>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
               onClick={() => setIsOpen(!isOpen)}
-              className="block md:hidden text-sm text-blue-600 transition"
+              className="block md:hidden p-2 text-blue-600 hover:bg-blue-50"
+              aria-label="Toggle Menu"
             >
-              {isOpen ? <FiX /> : <FiMenu />}
+              {isOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
             </Button>
 
             {isAuthenticated ? (
               <>
                 <Link
                   href="/Dashboard"
-                  className="hidden md:block px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition"
+                  className="hidden md:block px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition text-sm"
                 >
                   Dashboard
                 </Link>
@@ -80,7 +85,7 @@ const Header = () => {
             ) : (
               <Link
                 href="/Signin"
-                className="hidden md:block px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition"
+                className="hidden md:block px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition text-sm"
               >
                 Signin
               </Link>
@@ -89,26 +94,21 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Sheet positioned absolutely under the header */}
       {isOpen && (
-        <div className="fixed top-[3rem] left-0 right-0 z-40 bg-white shadow-md border-b rounded-b-xl h-[30vh] overflow-y-auto transition-all duration-500 animate-in slide-in-from-top">
-          <nav className="flex flex-col gap-4 p-6 text-gray-700 text-base">
+        <div className="fixed top-[3.5rem] left-0 right-0 z-40 bg-white border-b shadow-md rounded-b-xl min-h-[40vh] max-h-[60vh] overflow-y-auto transition-all duration-500 animate-in slide-in-from-top px-6 py-4">
+          <nav className="flex flex-col gap-4 text-gray-700 text-base sm:text-lg">
             <a href="#features" onClick={() => setIsOpen(false)} className="hover:text-blue-600">Features</a>
             <a href="#pricing" onClick={() => setIsOpen(false)} className="hover:text-blue-600">Pricing</a>
             <a href="#about" onClick={() => setIsOpen(false)} className="hover:text-blue-600">About</a>
             <a href="#contact" onClick={() => setIsOpen(false)} className="hover:text-blue-600">Contact</a>
 
-            {/* Explore Button */}
-            <div className="mt-auto pt-6">
-              <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => {
-                  setIsOpen(false);
-                  router.push("/explore");
-                }}
-              >
+            <div className="pt-6">
+              <Link
+                href="/Signin"
+                onClick={() => setIsOpen(false)}
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition">
                 Explore
-              </Button>
+              </Link>
             </div>
           </nav>
         </div>
