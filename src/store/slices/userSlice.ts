@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User, UserState } from "@/types/userstate";
+import { SelectedCourse, User, UserState } from "@/types/userstate";
+
 const initialState: UserState = {
   user: null,
   accessToken: null,
   isAuthenticated: false,
+  selectedCourse: null,
 };
 
 const userSlice = createSlice({
@@ -23,8 +25,18 @@ const userSlice = createSlice({
       state.accessToken = null;
       state.isAuthenticated = false;
     },
+    selectCourse: (
+      state,
+      action: PayloadAction<{ selectedCourse: SelectedCourse }>
+    ) => {
+      state.selectedCourse = action.payload.selectedCourse;
+    },
+
+    setCourse: (state, action: PayloadAction<string>) => {
+      state.selectedCourse = { courseId: action.payload };
+    },
   },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, logout, selectCourse, setCourse } = userSlice.actions;
 export default userSlice.reducer;

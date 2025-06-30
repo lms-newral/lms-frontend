@@ -11,12 +11,13 @@ import {
   X,
   Notebook,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/Dashboard", isActive: true },
   { title: "Announcements", icon: MessageSquare, url: "/Announcements" },
-  { title: "classes", icon: Book, url: "/classes" },
+  { title: "classes", icon: Book, url: "/Classes" },
   { title: "Assignments", icon: FileText, url: "/assignments" },
   { title: "Quiz", icon: PenTool, url: "/quiz" },
   { title: "Notes", icon: Notebook, url: "/Notes" },
@@ -62,7 +63,12 @@ export default function AppSidebar() {
       >
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <div className="text-2xl font-bold text-gray-900">lms.</div>
+          <Link
+            href={"/"}
+            className="text-2xl font-bold text-gray-900 cursor-pointer"
+          >
+            lms.
+          </Link>
           <button
             onClick={() => setIsOpen(false)}
             className="lg:hidden p-1 hover:bg-gray-100 rounded"

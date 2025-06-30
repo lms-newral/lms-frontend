@@ -41,6 +41,7 @@ const Header = () => {
   }, []);
 
   return (
+
     <>
       <header
         ref={headerRef}
@@ -53,7 +54,6 @@ const Header = () => {
           >
             lms<span className="text-blue-600">.</span>
           </Link>
-
           <nav className="hidden md:flex gap-4 md:gap-6 text-sm md:text-base lg:text-lg">
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition">Pricing</a>
