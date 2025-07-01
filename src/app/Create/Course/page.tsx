@@ -87,7 +87,7 @@ export default function CreateCoursePage() {
         </h2>
 
         <div className="mb-4">
-          <label className="block mb-1 font-medium flex items-center gap-2">
+          <label className="mb-1 font-medium flex items-center gap-2">
             <FaBookOpen className="text-blue-600" />
             Course Title*
           </label>

@@ -5,18 +5,45 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+interface ClassData {
+  id: string;
+  title: string;
+  courseId: string;
+  creatorId: string;
+  attendanceCount: number;
+  isLive: boolean;
+  videoLink?: string;
+  isRecorded: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  zoomLink?: string;
+}
 
 export default function ClassPage() {
   const [notes, setNotes] = useState([]);
   const [assignments, setAssignment] = useState([]);
   const [attachments, setAttachments] = useState([]);
+  const [classes, setClasses] = useState<ClassData>();
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState(null);
   const params = useParams();
+
   const user = useSelector((state: { user: UserState }) => state.user);
   useEffect(() => {
     async function getClassData() {
       try {
+        setLoading(true);
+        const classResp = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}class/single/${params.id}`,
+          {
+            headers: { Authorization: `Bearer ${user.accessToken}` },
+          }
+        );
+        setClasses(classResp.data);
+
         setLoading(true);
         const resp = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/class/${params.id}`,
@@ -34,14 +61,13 @@ export default function ClassPage() {
           }
         );
         setAssignment(res.data);
-        //Todo need to make backend route for this
-        /*   const response = await axios.get(
+        const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/class/${params.id}`,
           {
             headers: { Authorization: `Bearer ${user.accessToken}` },
           }
         );
-        setAttachments(response.data); */
+        setAttachments(response.data);
       } catch (err) {
         setError("Failed to fetch class data");
         console.error("Error fetching class data:", err);
@@ -82,6 +108,9 @@ export default function ClassPage() {
           NotesData={notes || ""}
           Assignments={assignments || ""}
           Attachments={attachments || ""}
+          meetLink={classes?.zoomLink}
+          videoLink={classes?.videoLink}
+          createdAt={classes?.createdAt}
         />
       </div>
     </div>

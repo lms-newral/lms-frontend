@@ -49,7 +49,7 @@ export default function SigninForm() {
       router.push("/");
     } catch (e: any) {
       console.log(e);
-      toast.error(e.message || "Something went wrong");
+      toast.error(e.response.data.message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }

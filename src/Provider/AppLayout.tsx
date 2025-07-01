@@ -41,7 +41,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
         // add all the routes in the sidebar here like attachments, notes, etc when you build them
 
-        if (path === "/Dashboard" || path === "/Classes" || path === "/Notes") {
+        if (
+          path === "/Dashboard" ||
+          path === "/Classes" ||
+          path === "/Notes" ||
+          path === "/Assignments" ||
+          path === "/Attachments"
+        ) {
           let courseIdToSet = storedCourseId;
 
           if (!storedCourseId) {
@@ -101,9 +107,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     path === "/Courses" ||
     path === "/Classes" ||
     path === `/Classes/${params.id}` ||
-    path === `/Notes`
+    path === `/Notes` ||
+    path === "/Assignments" ||
+    path === "/Attachments"
   ) {
-
     return (
       <div className="min-h-screen flex w-full">
         <AppSidebar />
@@ -111,7 +118,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           {/* Main content area */}
           <DashboardHeader />
           {children}
-          <Footer />
+          {/*<Footer />*/}
         </main>
       </div>
     );

@@ -262,6 +262,7 @@ export default function SignupForm() {
       toast.success("OTP has been resent to your email");
     } catch (error) {
       console.error("Error resending OTP:", error);
+
       toast.error("Failed to resend OTP. Please try again.");
     }
   };

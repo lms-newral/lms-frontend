@@ -1,32 +1,32 @@
 "use client";
-import NotesCard from "@/components/Classes/NotesCard";
 import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 interface Data {
-  notes: Notes[];
+  attachments: Attachment[];
   title: string;
 }
 
-interface Notes {
+interface Attachment {
   id: string;
   createdAt: string;
-  notesHtml: string;
+  attachment: string;
 }
 
-export default function NotesPage() {
+export default function AttachmentPage() {
   const [arrayData, setArrayData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const user = useSelector((state: { user: UserState }) => state.user);
-  const courseId = user.selectedCourse?.courseId;
+  const course = useSelector(
+    (state: { user: UserState }) => state.user.selectedCourse
+  );
 
   useEffect(() => {
-    async function getData() {
-      if (!courseId) {
+    async function getAttachmentData() {
+      if (!course?.courseId) {
         setError("No course selected");
         setLoading(false);
         return;
@@ -36,22 +36,21 @@ export default function NotesPage() {
         setLoading(true);
         setError(null);
 
-        const resp = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/course/${courseId}`
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/course/${course.courseId}`
         );
-
-        // Handle the case where resp.data might be empty or null
-        setArrayData(resp.data || []);
-        console.log(resp.data);
+        console.log(res);
+        // Handle the case where res.data might be empty or null
+        setArrayData(res.data || []);
       } catch (error) {
-        console.error("Error fetching notes:", error);
+        console.error("Error fetching Attachments:", error);
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 404) {
-            // Handle 404 - no notes found
+            // Handle 404 - no Attachments found
             setArrayData([]);
           } else {
             setError(
-              `Failed to load notes: ${
+              `Failed to load Attachments: ${
                 error.response?.data?.message || error.message
               }`
             );
@@ -64,13 +63,13 @@ export default function NotesPage() {
       }
     }
 
-    getData();
-  }, [courseId]); // Added courseId as dependency
+    getAttachmentData();
+  }, [course?.courseId]); // Added dependency
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading notes...</div>
+        <div className="text-lg">Loading Attachments...</div>
       </div>
     );
   }
@@ -86,12 +85,12 @@ export default function NotesPage() {
     );
   }
 
-  if (!user.selectedCourse) {
+  if (!course) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500 text-center">
           <h2 className="text-xl font-semibold mb-2">No Course Selected</h2>
-          <p>Please select a course to view notes.</p>
+          <p>Please select a course to view Attachments.</p>
         </div>
       </div>
     );
@@ -101,8 +100,8 @@ export default function NotesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500 text-center">
-          <h2 className="text-xl font-semibold mb-2">No Notes Found</h2>
-          <p>There are no notes available for this course yet.</p>
+          <h2 className="text-xl font-semibold mb-2">No Attachments Found</h2>
+          <p>There are no Attachments available for this course yet.</p>
         </div>
       </div>
     );
@@ -110,9 +109,9 @@ export default function NotesPage() {
 
   return (
     <div className="min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-6 text-center">Course Notes</h1>
-
-      {/* Map over the whole course data first to get the notes according to class */}
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Course Attachments
+      </h1>
       {arrayData.map((value: Data, index: number) => {
         return (
           <div
@@ -123,26 +122,34 @@ export default function NotesPage() {
               {value.title}
             </h2>
 
-            {/* Now mapping over each note in a class */}
-            {value.notes && value.notes.length > 0 ? (
+            {value.attachments && value.attachments.length > 0 ? (
               <div className="w-full max-w-4xl">
-                {value.notes.map((note: Notes, index2: number) => {
-                  return (
-                    <div key={note.id || index2} className="mb-6">
-                      <NotesCard
-                        notesId={note.id}
-                        htmlContent={note.notesHtml}
-                      />
-                      <div className="mb-2 text-sm text-gray-500 text-center mt-2">
-                        Created: {new Date(note.createdAt).toLocaleDateString()}
+                {value.attachments.map(
+                  (Attachment: Attachment, index2: number) => {
+                    return (
+                      <div key={Attachment.id || index2} className="mb-6">
+                        <div className="mb-4 p-4 shadow border bg-white rounded-lg">
+                          <div className="mb-2 text-sm text-gray-500">
+                            Attachment #{index2 + 1}
+                          </div>
+                          <div className="text-gray-800 whitespace-pre-wrap">
+                            {Attachment.attachment}
+                          </div>
+                          <div className="mt-3 text-sm text-gray-500">
+                            Created:{" "}
+                            {new Date(
+                              Attachment.createdAt
+                            ).toLocaleDateString()}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
               </div>
             ) : (
               <div className="text-gray-500 text-center py-8">
-                <p>No notes available for this class.</p>
+                <p>No Attachments available for this class.</p>
               </div>
             )}
           </div>

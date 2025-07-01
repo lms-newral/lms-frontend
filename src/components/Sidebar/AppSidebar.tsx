@@ -2,10 +2,8 @@
 import {
   Book,
   FileText,
-  HelpCircle,
   Home,
   MessageSquare,
-  MoreHorizontal,
   PenTool,
   Menu,
   X,
@@ -18,14 +16,9 @@ const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/Dashboard", isActive: true },
   { title: "Announcements", icon: MessageSquare, url: "/Announcements" },
   { title: "classes", icon: Book, url: "/Classes" },
-  { title: "Assignments", icon: FileText, url: "/assignments" },
-  { title: "Quiz", icon: PenTool, url: "/quiz" },
+  { title: "Assignments", icon: FileText, url: "/Assignments" },
+  { title: "Attachments", icon: PenTool, url: "/Attachments" },
   { title: "Notes", icon: Notebook, url: "/Notes" },
-];
-
-const bottomItems = [
-  { title: "More", icon: MoreHorizontal, url: "/more" },
-  { title: "Support Ticket", icon: HelpCircle, url: "/support" },
 ];
 
 export default function AppSidebar() {
@@ -94,23 +87,6 @@ export default function AppSidebar() {
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   }
                 `}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span className="font-medium truncate">{item.title}</span>
-              </a>
-            ))}
-          </nav>
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
-          <nav className="space-y-1">
-            {bottomItems.map((item) => (
-              <a
-                key={item.title}
-                href={item.url}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
                 <span className="font-medium truncate">{item.title}</span>
