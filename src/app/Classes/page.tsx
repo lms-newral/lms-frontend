@@ -4,9 +4,9 @@ import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+
 interface ClassData {
-  _id: string;
+  id: string;
   title: string;
   videoLink?: string;
   attachments: string;
@@ -98,15 +98,14 @@ export default function Classes() {
     <div className="min-h-screen">
       <div>
         {classes.map((classItem) => (
-          <Link
-            key={classItem._id}
-            href={classItem.videoLink || classItem.zoomLink || ""} // replace this with classPage link where we can show all the attachments notes and assignments of class
-          >
+
+          <div key={classItem.id}>
             <ClassCard
               isClient={isClient}
-              _id={classItem._id}
+              id={classItem.id}
               title={classItem.title}
               videoLink={classItem.videoLink}
+              zoomLink={classItem.zoomLink || ""}
               attachments={classItem.attachments}
               courseId={classItem.courseId}
               creatorId={classItem.creatorId}
@@ -117,7 +116,8 @@ export default function Classes() {
               createdAt={classItem.createdAt}
               updatedAt={classItem.updatedAt}
             />
-          </Link>
+
+          </div>
         ))}
       </div>
     </div>
