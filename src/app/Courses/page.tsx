@@ -1,7 +1,9 @@
 "use client";
 import CourseCard from "@/components/Courses/CourseCard";
 import { setCourse } from "@/store/slices/userSlice";
+
 import { UserState } from "@/types/userstate";
+
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -82,7 +84,9 @@ export default function CoursesPage() {
             {data.map((courseData, index) => {
               return (
                 <Link
+
                   key={index}
+
                   href={`/Classes`}
                   className="w-full"
                   onClick={() =>

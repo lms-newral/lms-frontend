@@ -4,6 +4,7 @@ import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+
 interface ClassData {
   id: string;
   title: string;
@@ -97,6 +98,7 @@ export default function Classes() {
     <div className="min-h-screen">
       <div>
         {classes.map((classItem) => (
+
           <div key={classItem.id}>
             <ClassCard
               isClient={isClient}
@@ -114,6 +116,7 @@ export default function Classes() {
               createdAt={classItem.createdAt}
               updatedAt={classItem.updatedAt}
             />
+
           </div>
         ))}
       </div>

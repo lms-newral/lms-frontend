@@ -1,3 +1,4 @@
+
 import { Users, Calendar, Clock, Play, ArrowBigRight } from "lucide-react";
 import Link from "next/link";
 
@@ -35,6 +36,7 @@ export default function ClassCard(classItem: ClassData) {
       minute: "2-digit",
     });
   };
+
 
   const data = classItem;
 
@@ -115,6 +117,7 @@ export default function ClassCard(classItem: ClassData) {
 
         {/* Subtle hover overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"></div>
+
       </div>
     </div>
   );
