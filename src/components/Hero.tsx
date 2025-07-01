@@ -1,9 +1,53 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import gsap from "gsap";
+import { useRef, useEffect } from "react";
 
 const Hero = () => {
   const router = useRouter();
+
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const paraRef = useRef<HTMLParagraphElement | null>(null);
+  const btnsRef = useRef<HTMLDivElement | null>(null);
+  const trustRef = useRef<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    const tl = gsap.timeline();
+
+    setTimeout(() => {
+      if (
+        titleRef.current &&
+        paraRef.current &&
+        btnsRef.current &&
+        trustRef.current
+      ) {
+        tl.fromTo(
+          titleRef.current,
+          { opacity: 0, y: 50 },
+          { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
+        )
+          .fromTo(
+            paraRef.current,
+            { opacity: 0, y: -20 },
+            { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+            "-=0.5"
+          )
+          .fromTo(
+            btnsRef.current,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+            "-=0.5"
+          )
+          .fromTo(
+            trustRef.current,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+            "-=0.4"
+          );
+      }
+    }, 0);
+  }, []);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white overflow-hidden">
@@ -36,15 +80,18 @@ const Hero = () => {
         </svg>
       </div>
 
-      <div className="container mx-auto px-6 text-center relative z-10">
-        <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 animate-fade-in">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h1
+          ref={titleRef}
+          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6"
+        >
           Learn Without
           <span className="block text-blue-600">Limits</span>
         </h1>
 
         <p
-          className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto animate-fade-in"
-          style={{ animationDelay: "0.2s" }}
+          ref={paraRef}
+          className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto"
         >
           Transform your educational journey with our cutting-edge Learning
           Management System. Create, manage, and deliver exceptional learning
@@ -52,36 +99,42 @@ const Hero = () => {
         </p>
 
         <div
-          className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in"
-          style={{ animationDelay: "0.4s" }}
+          ref={btnsRef}
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
         >
           <Button
             size="lg"
             onClick={() => router.push("/signin")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
           >
             Start Learning Today
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg"
+            className="border-blue-600 text-blue-600 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
           >
             Watch Demo
           </Button>
         </div>
 
-        <div
-          className="mt-16 animate-fade-in"
-          style={{ animationDelay: "0.6s" }}
-        >
-          <p className="text-gray-500 text-sm mb-4">
+        <div className="mt-10 sm:mt-14">
+          <p
+            ref={trustRef}
+            className="text-xs sm:text-sm md:text-base text-gray-500 mb-4"
+          >
             Trusted by 10,000+ learners worldwide
           </p>
-          <div className="flex justify-center space-x-8 opacity-60">
-            <div className="text-2xl font-bold text-gray-400">Company A</div>
-            <div className="text-2xl font-bold text-gray-400">Company B</div>
-            <div className="text-2xl font-bold text-gray-400">Company C</div>
+          <div className="flex flex-wrap justify-center gap-4 opacity-60">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-400">
+              Company A
+            </div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-400">
+              Company B
+            </div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-400">
+              Company C
+            </div>
           </div>
         </div>
       </div>
