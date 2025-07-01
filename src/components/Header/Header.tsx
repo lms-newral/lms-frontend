@@ -30,6 +30,7 @@ const Header = () => {
     router.push("/");
   };
 
+
   useEffect(() => {
     if (headerRef.current) {
       gsap.fromTo(
@@ -39,6 +40,7 @@ const Header = () => {
       );
     }
   }, []);
+
 
   return (
 
