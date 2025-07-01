@@ -55,7 +55,7 @@ const Classes = () => {
 
         try {
             const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/class/create/${courseId}`, // ✅ Fixed endpoint structure
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/class/create/${courseId}`, 
                 classData,
                 {
                     headers: {
