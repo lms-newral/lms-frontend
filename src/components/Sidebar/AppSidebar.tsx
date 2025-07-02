@@ -14,7 +14,7 @@ import { useState } from "react";
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/Dashboard", isActive: true },
-  { title: "Announcements", icon: MessageSquare, url: "/Announcements" },
+  { title: "Courses", icon: MessageSquare, url: "/Courses" },
   { title: "classes", icon: Book, url: "/Classes" },
   { title: "Assignments", icon: FileText, url: "/Assignments" },
   { title: "Attachments", icon: PenTool, url: "/Attachments" },
