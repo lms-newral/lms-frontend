@@ -44,11 +44,13 @@ const Classes = () => {
 
 
     useEffect(() => {
+        console.log(token);
         if (!token) toast.error('user is not authenticated');
     }, [token]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!title || !courseId) return toast.error("Please fill in title and course.");
         if ((liveLink && recordedLink) || (!liveLink && !recordedLink)) {
             return toast.error("Fill either Live or Recorded Link (not both).");
@@ -66,17 +68,80 @@ const Classes = () => {
         };
 
         try {
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/class/create/${courseId}`,
-                classData, {
-                headers:
+            // 1. Create class
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
+                classData,
                 {
-                    Authorization: `Bearer ${token}`
+                    headers: { Authorization: `Bearer ${token}` }
                 }
-            });
+            );
 
 
+            // 2. Add Notes
+            if (noteHtml) {
+                try {
+                    await axios.post(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${courseId}`,
+                        {
+                            notesHtml: noteHtml,
+                            courseId,
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                } catch (err) {
+                    console.error("Notes error:", err);
+                }
+            }
+
+            // 3. Add Attachments
+            await Promise.all(attachments.map(async (link) => {
+                try {
+                    await axios.post(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${courseId}`,
+                        {
+                            attachment: link,
+                            courseId,
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                } catch (err: any) {
+                    console.error("Attachment error:", err);
+                }
+            }));
+
+            // 4. Add Assignments
+            await Promise.all(assignments.map(async (link) => {
+                try {
+                    await axios.post(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${courseId}`,
+                        {
+                            assignments: link,
+                            courseId,
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                } catch (err) {
+                    console.error("Assignment error:", err);
+                }
+            }));
+
+            toast.success("Class, notes, attachments, and assignments created!");
+
+            // 5. Reset form
             if (res.status === 201 || res.status === 200) {
-                toast.success("Class created!");
                 setTitle("");
                 setLiveLink("");
                 setRecordedLink("");
@@ -91,6 +156,7 @@ const Classes = () => {
             toast.error(error.response?.data?.message || "Failed to create class.");
         }
     };
+
 
     const countWords = (text: string) => {
         return text.trim().split(/\s+/).filter(Boolean).length;
