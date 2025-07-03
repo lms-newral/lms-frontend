@@ -1,7 +1,7 @@
 "use client";
 import DashboardContent from "@/components/Dashboard/DashboardContent";
 import { Classes, Course, CourseEnrollment } from "@/types/DataTypes";
-import { SelectedCourse, UserState } from "@/types/userstate";
+import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -50,7 +50,7 @@ export default function Dashboard() {
         user={{ name: user.user?.username ?? "" }}
         classes={classes}
         courses={courses}
-        selectedCourse={selectedCourse ?? { title: "", thumbnail: "" }}
+        selectedCourse={selectedCourse ?? { id: "", title: "", thumbnail: "" }}
       />
     </div>
   );

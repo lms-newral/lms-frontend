@@ -1,7 +1,6 @@
 "use client";
 import { Classes, Course, CourseEnrollment } from "@/types/DataTypes";
-import { SelectedCourse } from "@/types/userstate";
-import { BookOpen, Calendar, Play } from "lucide-react";
+import { BookOpen, Calendar, Divide, Play } from "lucide-react";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -17,6 +16,7 @@ interface User {
 }
 
 export default function DashboardContent(props: props) {
+  console.log("props", props.selectedCourse);
   const user = props.user;
   const courses = props.courses;
   const classes = props.classes;
@@ -26,31 +26,37 @@ export default function DashboardContent(props: props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6 col-span-3">
           <div className="w-full flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-800 mb-2">
-                Selected course
-              </h1>
-              <Link
-                href={"/Courses"}
-                className="flex gap-2 text-sm text-gray-500 items-center mt-2"
-              >
-                Select different course <FiArrowRight className="text-xs" />{" "}
-              </Link>
-            </div>
-            <div className="text-right">
-              <p className="text-lg font-semibold text-slate-700 mb-3">
-                course title
-              </p>
-              {props.selectedCourse?.thumbnail ? (
-                <img
-                  className="-32 h-20 object-cover rounded-xl shadow-md border-2 border-white"
-                  src={props.selectedCourse.thumbnail}
-                  alt={props.selectedCourse.title}
-                />
-              ) : (
-                <>please enroll in a course</>
-              )}
-            </div>
+            {props.selectedCourse ? (
+              <div className="w-full flex justify-between items-center">
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-800 mb-2">
+                    Selected course
+                  </h1>
+                  <Link
+                    href={"/Courses"}
+                    className="flex gap-2 text-sm text-gray-500 items-center mt-2"
+                  >
+                    Select different course <FiArrowRight className="text-xs" />{" "}
+                  </Link>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-semibold text-slate-700 mb-3">
+                    course title
+                  </p>
+                  {props.selectedCourse?.thumbnail ? (
+                    <img
+                      className="-32 h-20 object-cover rounded-xl shadow-md border-2 border-white"
+                      src={props.selectedCourse.thumbnail}
+                      alt={props.selectedCourse.title}
+                    />
+                  ) : (
+                    <>please enroll in a course</>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>Please enroll in a course</div>
+            )}
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
