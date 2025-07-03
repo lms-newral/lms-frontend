@@ -7,6 +7,7 @@ import { UserState } from "@/types/userstate";
 import { logoutUser } from "@/lib/logout";
 import { logout } from "@/store/slices/userSlice";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -25,6 +26,9 @@ export default function DashboardHeader() {
       <div className="flex items-center justify-between w-full gap-4">
         {/* Search section - responsive */}
         <div className="flex items-center flex-1 max-w-md md:max-w-lg">
+          <Link className="text-lg font-bold" href="/">
+            lms.
+          </Link>
           <div className=" relative w-full ml-12 ">
             <Search className="hidden md:block absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input

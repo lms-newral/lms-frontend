@@ -10,6 +10,45 @@ import AppSidebar from "@/components/Sidebar/AppSidebar";
 import DashboardHeader from "@/components/Dashboard/DashboardHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
+// Utility function to handle localStorage operations safely
+const safeLocalStorage = {
+  setItem: (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (error) {
+      console.warn(`Failed to set localStorage item ${key}:`, error);
+      // Fallback to sessionStorage
+      try {
+        sessionStorage.setItem(key, value);
+        console.log(`Fallback: Set ${key} in sessionStorage`);
+        return true;
+      } catch (sessionError) {
+        console.warn(`Failed to set sessionStorage item ${key}:`, sessionError);
+        return false;
+      }
+    }
+  },
+
+  getItem: (key) => {
+    try {
+      return localStorage.getItem(key) || sessionStorage.getItem(key);
+    } catch (error) {
+      console.warn(`Failed to get item ${key}:`, error);
+      return null;
+    }
+  },
+
+  removeItem: (key) => {
+    try {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    } catch (error) {
+      console.warn(`Failed to remove item ${key}:`, error);
+    }
+  },
+};
+
 export default function AppLayout({ children }: { children: ReactNode }) {
   const path = usePathname();
   const dispatch = useDispatch();
@@ -17,12 +56,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const refreshToken = async () => {
-      const token = localStorage.getItem("refreshToken");
-      const storedCourseId = localStorage.getItem("courseId");
+      const token = safeLocalStorage.getItem("refreshToken");
+      const storedCourseId = safeLocalStorage.getItem("courseId");
+
       if (!token) {
         setIsLoading(false);
         return;
       }
+
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}auth/refresh`,
@@ -37,7 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           })
         );
 
-        // Course logic remains the same
+        // Course logic for dashboard routes
         if (
           path === "/" ||
           path === "/Dashboard" ||
@@ -47,32 +88,48 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           path === "/Attachments"
         ) {
           let courseIdToSet = storedCourseId;
+
+          // Only fetch courses if no stored courseId exists
           if (!storedCourseId) {
             try {
               const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${response.data.user.id}`;
               const courseResponse = await axios.get(url);
+
               if (courseResponse.data && courseResponse.data.length > 0) {
                 courseIdToSet = courseResponse.data[0].course.id;
-                localStorage.setItem("courseId", courseIdToSet || "");
+                console.log("Setting courseId from API:", courseIdToSet);
+
+                // Use safe localStorage function
+                const success = safeLocalStorage.setItem(
+                  "courseId",
+                  courseIdToSet || ""
+                );
+                if (!success) {
+                  console.error("Failed to save courseId to storage");
+                }
               }
             } catch (courseError) {
               console.error("Error fetching courses:", courseError);
             }
           }
 
+          // Set course in Redux store
           if (courseIdToSet) {
             dispatch(setCourse(courseIdToSet));
           }
         }
-        localStorage.setItem("refreshToken", response.data.refreshToken);
+
+        // Save refresh token
+        safeLocalStorage.setItem("refreshToken", response.data.refreshToken);
       } catch (error) {
         console.error("Refresh token error:", error);
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("courseId");
+        safeLocalStorage.removeItem("refreshToken");
+        safeLocalStorage.removeItem("courseId");
       } finally {
         setIsLoading(false);
       }
     };
+
     refreshToken();
   }, [dispatch, path]);
 
