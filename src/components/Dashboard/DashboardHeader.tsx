@@ -1,5 +1,4 @@
 import { Search } from "lucide-react";
-import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import ProfileDropdown from "../Header/ProfileDropdown";
 import { useDispatch, useSelector } from "react-redux";

@@ -1,6 +1,6 @@
 "use client";
 import CourseCard from "@/components/Courses/CourseCard";
-import { setCourse } from "@/store/slices/userSlice";
+import { setCourseWithPersistence } from "@/store/slices/userSlice";
 import { Course } from "@/types/DataTypes";
 
 import { UserState } from "@/types/userstate";
@@ -22,7 +22,7 @@ export default function CoursesPage() {
   const user = useSelector((state: { user: UserState }) => state.user.user);
 
   function handleCourseSelectionSimple(courseId: string) {
-    dispatch(setCourse(courseId));
+    dispatch(setCourseWithPersistence(courseId));
     localStorage.setItem("courseId", courseId);
   }
 
