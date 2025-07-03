@@ -1,4 +1,5 @@
 "use client";
+import { Attachment } from "@/types/DataTypes";
 import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -7,12 +8,6 @@ import { useSelector } from "react-redux";
 interface Data {
   attachments: Attachment[];
   title: string;
-}
-
-interface Attachment {
-  id: string;
-  createdAt: string;
-  attachment: string;
 }
 
 export default function AttachmentPage() {

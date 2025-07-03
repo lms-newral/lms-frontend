@@ -20,32 +20,32 @@ enum Role {
   SUPER_ADMIN = "SUPER_ADMIN",
 }
 export interface CourseEnrollment {
-  student: User;
-  studentId: string;
-  course: Course;
-  courseId: string;
-  enrolledAt: string; //Date and time
-  completedAt: string; //Date and time
-  lastAccessedAt: string; //Date and time
+  student?: User;
+  studentId?: string;
+  course?: Course;
+  courseId?: string;
+  enrolledAt?: string; //Date and time
+  completedAt?: string; //Date and time
+  lastAccessedAt?: string; //Date and time
 }
 export interface Course {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   thumbnail?: string;
-  isActive: boolean;
+  isActive?: boolean;
   price?: number;
   category?: string;
-  creator: User;
-  creatorId: string;
-  enrollments: CourseEnrollment[];
-  classes: Classes[];
-
-  createdAt: string;
-  updatedAt: string;
-  Note: Note[];
-  Assignment: Assignment[];
-  Attachments: Attachment[];
+  creator?: User;
+  creatorId?: string;
+  enrollments?: CourseEnrollment[];
+  classes?: Classes[];
+  class_count?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  Note?: Note[];
+  Assignment?: Assignment[];
+  Attachments?: Attachment[];
 }
 export interface Note {
   id: string;

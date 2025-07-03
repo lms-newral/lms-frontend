@@ -1,46 +1,26 @@
 "use client";
+import { Classes, Course, CourseEnrollment } from "@/types/DataTypes";
+import { SelectedCourse } from "@/types/userstate";
 import { BookOpen, Calendar, Play } from "lucide-react";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
 interface props {
   user: User;
-  courses: Course[];
+  courses: CourseEnrollment[];
   classes: Classes[];
-  selectedCourse: SelectedCourse;
+  selectedCourse: Course;
 }
 
 interface User {
   name: string;
 }
 
-interface Course {
-  course: {
-    id: string;
-    title: string;
-    _count: { classes: number };
-  };
-}
-
-interface Classes {
-  id: string;
-  title: string;
-  course: {
-    title: string;
-  };
-  createdAt: string;
-  isLive: boolean;
-  isRecorded: boolean;
-  scheduledAt: string;
-}
-interface SelectedCourse {
-  title: string;
-  thumbnail: string;
-}
 export default function DashboardContent(props: props) {
   const user = props.user;
   const courses = props.courses;
   const classes = props.classes;
+  console.log(courses);
   const OverviewTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -61,7 +41,7 @@ export default function DashboardContent(props: props) {
               <p className="text-lg font-semibold text-slate-700 mb-3">
                 course title
               </p>
-              {props.selectedCourse.thumbnail ? (
+              {props.selectedCourse?.thumbnail ? (
                 <img
                   className="-32 h-20 object-cover rounded-xl shadow-md border-2 border-white"
                   src={props.selectedCourse.thumbnail}
@@ -119,7 +99,7 @@ export default function DashboardContent(props: props) {
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              {classes.slice(0, 3).map((class_, index) => (
+              {classes.slice(0, 3).map((class_) => (
                 <div key={class_.id} className="flex items-center space-x-4">
                   <div
                     className={`w-3 h-3 rounded-full ${
@@ -158,17 +138,17 @@ export default function DashboardContent(props: props) {
             <div className="space-y-4">
               {courses.map((course, index) => (
                 <div
-                  key={course.course.id}
+                  key={course?.course?.id || index}
                   className="flex items-center justify-between"
                 >
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      {course.course.title}
+                      {course?.course?.title || "Error"}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-500">
-                      {course.course._count?.classes ?? 0} classes
+                      {course?.course?.class_count ?? 0} classes
                     </p>
                   </div>
                 </div>

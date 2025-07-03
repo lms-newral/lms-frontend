@@ -1,37 +1,15 @@
 "use client";
 import DashboardContent from "@/components/Dashboard/DashboardContent";
-import { UserState } from "@/types/userstate";
+import { Classes, Course, CourseEnrollment } from "@/types/DataTypes";
+import { SelectedCourse, UserState } from "@/types/userstate";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-interface Course {
-  course: {
-    id: string;
-    title: string;
-    _count: { classes: number }; //number of classes in a course
-  };
-}
-
-interface Classes {
-  id: string;
-  title: string;
-  course: {
-    title: string;
-  }; // course which this class belongs to
-  createdAt: string;
-  isLive: boolean;
-  isRecorded: boolean;
-  scheduledAt: string;
-}
-interface SelectedCourse {
-  title: string;
-  thumbnail: string;
-}
 export default function Dashboard() {
   const [classes, setClasses] = useState<Classes[]>([]);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<SelectedCourse>();
+  const [courses, setCourses] = useState<CourseEnrollment[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<Course>();
   const user = useSelector((state: { user: UserState }) => state.user);
 
   useEffect(() => {
@@ -40,6 +18,7 @@ export default function Dashboard() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${user.user?.id}`
       );
+      console.log(response.data);
       setCourses(response.data);
     }
     //to get the classes in enrolled courses data
@@ -51,7 +30,6 @@ export default function Dashboard() {
         }
       );
 
-      console.log(response.data);
       setClasses(response.data);
     }
     //to get the currrently selected course data
