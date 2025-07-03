@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import {
   Book,
@@ -11,6 +12,16 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+=======
+import { Search } from "lucide-react";
+import { Input } from "../ui/input";
+import ProfileDropdown from "../Header/ProfileDropdown";
+import { useDispatch, useSelector } from "react-redux";
+import { UserState } from "@/types/userstate";
+import { logoutUser } from "@/lib/logout";
+import { logout } from "@/store/slices/userSlice";
+import { useRouter } from "next/navigation";
+>>>>>>> f859b9352dcb8b0672bb24499c758cbb04dbbd60
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
