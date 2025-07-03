@@ -7,7 +7,6 @@ import axios from "axios";
 import { toast } from "sonner";
 
 import {
-
   BookOpen,
   Video,
   VideoOff,
@@ -25,34 +24,41 @@ import {
 } from "lucide-react";
 
 import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { Underline } from "@tiptap/extension-underline";
+import { UserState } from "@/types/userstate";
+
+export default function CreateClass() {
+  const router = useRouter();
+  const user = useSelector((state: { user: UserState }) => state.user);
 
 
+  const [assignments, setAssignments] = useState<string[]>([]);
+  const [assignmentInput, setAssignmentInput] = useState("");
 
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [attachmentInput, setAttachmentInput] = useState("");
 
-    const [assignments, setAssignments] = useState<string[]>([]);
-    const [assignmentInput, setAssignmentInput] = useState("");
+  const [noteHtml, setNoteHtml] = useState("");
 
-    const [attachments, setAttachments] = useState<string[]>([]);
-    const [attachmentInput, setAttachmentInput] = useState("");
+  const [title, setTitle] = useState("");
+  const [liveLink, setLiveLink] = useState("");
+  const [recordedLink, setRecordedLink] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [courses, setCourses] = useState<any[]>([]);
 
-    const [noteHtml, setNoteHtml] = useState("");
-
-
-
-  /* ──────────────── fetch courses ──────────────── */
+  // Fetch courses
   useEffect(() => {
-    if (!user.accessToken) {
+    if (!user?.accessToken) {
       toast.error("User is not authenticated");
       router.push("/");
       return;
@@ -62,7 +68,8 @@ import { Underline } from "@tiptap/extension-underline";
       if (["ADMIN", "SUPER_ADMIN"].includes(user.user?.role ?? "")) {
         try {
           const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}course`
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}course`,
+            { headers: { Authorization: `Bearer ${user.accessToken}` } }
           );
           setCourses(res.data);
         } catch {
@@ -74,7 +81,6 @@ import { Underline } from "@tiptap/extension-underline";
     getCourses();
   }, [user, router]);
 
-  /* ──────────────── TipTap editor setup ──────────────── */
   const countWords = (t: string) =>
     t.trim().split(/\s+/).filter(Boolean).length;
 
@@ -95,11 +101,9 @@ import { Underline } from "@tiptap/extension-underline";
     },
   });
 
-  /* ──────────────── submit handler ──────────────── */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    /* basic validations */
     if (!title || !courseId)
       return toast.error("Please fill in title and course.");
     if ((liveLink && recordedLink) || (!liveLink && !recordedLink))
@@ -111,25 +115,22 @@ import { Underline } from "@tiptap/extension-underline";
       zoomLink: liveLink || "",
       isLive: !!liveLink,
       isRecorded: !!recordedLink,
-      notes: noteHtml, // (optional: your backend may ignore)
+      notes: noteHtml,
       assignments,
       attachments,
     };
 
     try {
-      /* 1️⃣  Create class */
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
         classPayload,
         { headers: { Authorization: `Bearer ${user.accessToken}` } }
       );
 
-      /* Grab the classId returned by the backend */
       const classId =
         res.data?.data?.id ?? res.data?.data?.classId ?? res.data?.classId;
       if (!classId) throw new Error("classId not returned from backend");
 
-      /* 2️⃣  Create note (HTML) */
       if (noteHtml) {
         await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${classId}`,
@@ -138,7 +139,6 @@ import { Underline } from "@tiptap/extension-underline";
         );
       }
 
-      /* 3️⃣  Create attachments */
       await Promise.all(
         attachments.map((link) =>
           axios.post(
@@ -149,7 +149,6 @@ import { Underline } from "@tiptap/extension-underline";
         )
       );
 
-      /* 4️⃣  Create assignments */
       await Promise.all(
         assignments.map((link) =>
           axios.post(
@@ -160,11 +159,9 @@ import { Underline } from "@tiptap/extension-underline";
         )
       );
 
+      toast.success("Class, notes, attachments, and assignments created!");
 
-            toast.success("Class, notes, attachments, and assignments created!");
-
-
-      /* reset form */
+      // Reset form
       setTitle("");
       setLiveLink("");
       setRecordedLink("");
@@ -180,7 +177,6 @@ import { Underline } from "@tiptap/extension-underline";
       );
     }
   };
-
   /* -------------------------------------------------- */
   /* -------------------  RENDER  ---------------------- */
   /* -------------------------------------------------- */
@@ -391,7 +387,8 @@ import { Underline } from "@tiptap/extension-underline";
           >
             Create Class
           </button>
-
         </div>
-    );
+      </form>
+    </div>
+  );
 }
