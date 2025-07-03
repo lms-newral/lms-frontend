@@ -108,7 +108,7 @@ export default function AppSidebar() {
           <nav className="space-y-1">
             {navigationItems.map((item) => {
               return (
-                <a
+                <Link
                   key={item.title}
                   href={item.url}
                   onClick={() => setIsOpen(false)}
@@ -141,7 +141,7 @@ export default function AppSidebar() {
                       {item.title}
                     </div>
                   )}
-                </a>
+                </Link>
               );
             })}
           </nav>

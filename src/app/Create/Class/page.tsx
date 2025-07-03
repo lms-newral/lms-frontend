@@ -44,6 +44,7 @@ export default function Classes() {
   const router = useRouter();
   const user = useSelector((state: { user: UserState }) => state.user);
 
+
   /* ──────────────── local state ──────────────── */
   const [title, setTitle] = useState("");
   const [liveLink, setLiveLink] = useState("");
@@ -75,6 +76,7 @@ export default function Classes() {
             `${process.env.NEXT_PUBLIC_BACKEND_URL}course`
           );
           setCourses(res.data);
+          console.log(res.data);
         } catch {
           toast.error("Could not fetch courses");
         }
