@@ -7,6 +7,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 import {
+
   BookOpen,
   Video,
   VideoOff,
@@ -24,11 +25,11 @@ import {
 } from "lucide-react";
 
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
 } from "@/components/ui/select";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -36,30 +37,18 @@ import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { Underline } from "@tiptap/extension-underline";
 
-import { UserState } from "@/types/userstate";
-import { Course } from "@/types/DataTypes";
 
-/* -------------------------------------------------- */
 
-export default function Classes() {
-  const router = useRouter();
-  const user = useSelector((state: { user: UserState }) => state.user);
 
-  /* ──────────────── local state ──────────────── */
-  const [title, setTitle] = useState("");
-  const [liveLink, setLiveLink] = useState("");
-  const [recordedLink, setRecordedLink] = useState("");
-  const [courseId, setCourseId] = useState("");
+    const [assignments, setAssignments] = useState<string[]>([]);
+    const [assignmentInput, setAssignmentInput] = useState("");
 
-  const [courses, setCourses] = useState<Course[]>([]);
+    const [attachments, setAttachments] = useState<string[]>([]);
+    const [attachmentInput, setAttachmentInput] = useState("");
 
-  const [assignments, setAssignments] = useState<string[]>([]);
-  const [assignmentInput, setAssignmentInput] = useState("");
+    const [noteHtml, setNoteHtml] = useState("");
 
-  const [attachments, setAttachments] = useState<string[]>([]);
-  const [attachmentInput, setAttachmentInput] = useState("");
 
-  const [noteHtml, setNoteHtml] = useState("");
 
   /* ──────────────── fetch courses ──────────────── */
   useEffect(() => {
@@ -171,7 +160,9 @@ export default function Classes() {
         )
       );
 
-      toast.success("Class, notes, attachments, and assignments created!");
+
+            toast.success("Class, notes, attachments, and assignments created!");
+
 
       /* reset form */
       setTitle("");
@@ -400,8 +391,7 @@ export default function Classes() {
           >
             Create Class
           </button>
+
         </div>
-      </form>
-    </div>
-  );
+    );
 }
