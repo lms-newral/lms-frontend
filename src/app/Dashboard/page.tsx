@@ -18,7 +18,7 @@ export default function Dashboard() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${user.user?.id}`
       );
-      console.log(response.data);
+      console.log(response.data[0].course);
       setCourses(response.data);
     }
     //to get the classes in enrolled courses data

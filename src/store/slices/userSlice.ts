@@ -1,28 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SelectedCourse, User, UserState } from "@/types/userstate";
 
-// Safe localStorage utility
-const safeLocalStorage = {
-  setItem: (key: string, value: string) => {
-    try {
-      localStorage.setItem(key, value);
-      return true;
-    } catch (error) {
-      console.warn(`Failed to set localStorage item ${key}:`, error);
-      return false;
-    }
-  },
-
-  getItem: (key: string) => {
-    try {
-      return localStorage.getItem(key);
-    } catch (error) {
-      console.warn(`Failed to get item ${key}:`, error);
-      return null;
-    }
-  },
-};
-
 const initialState: UserState = {
   user: null,
   accessToken: null,
@@ -52,31 +30,13 @@ const userSlice = createSlice({
       action: PayloadAction<{ selectedCourse: SelectedCourse }>
     ) => {
       state.selectedCourse = action.payload.selectedCourse;
-      if (action.payload.selectedCourse.courseId) {
-        safeLocalStorage.setItem(
-          "courseId",
-          action.payload.selectedCourse.courseId
-        );
-      }
     },
 
     setCourse: (state, action: PayloadAction<string>) => {
       state.selectedCourse = { courseId: action.payload };
     },
-    setCourseWithPersistence: (state, action: PayloadAction<string>) => {
-      state.selectedCourse = { courseId: action.payload };
-      // Try to persist to localStorage but it doesn't fail if it doesn't work
-      safeLocalStorage.setItem("courseId", action.payload);
-      console.log("Course set in Redux:", action.payload);
-    },
   },
 });
 
-export const {
-  setUser,
-  logout,
-  selectCourse,
-  setCourse,
-  setCourseWithPersistence,
-} = userSlice.actions;
+export const { setUser, logout, selectCourse, setCourse } = userSlice.actions;
 export default userSlice.reducer;
