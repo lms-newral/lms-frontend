@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/Dashboard", isActive: true },
@@ -23,7 +25,9 @@ const navigationItems = [
 
 export default function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const user = useSelector((state: any) => state.user.user);
 
+  const role = user?.role;
   return (
     <>
       {/* Mobile Menu Button */}
@@ -81,10 +85,9 @@ export default function AppSidebar() {
                 onClick={() => setIsOpen(false)}
                 className={`
                   flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
-                  ${
-                    item.isActive
-                      ? "bg-blue-50 text-blue-600 border border-blue-200"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                  ${item.isActive
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   }
                 `}
               >
@@ -92,6 +95,18 @@ export default function AppSidebar() {
                 <span className="font-medium truncate">{item.title}</span>
               </a>
             ))}
+
+
+            {["ADMIN", "SUPERADMIN", "TEACHER"].includes(role) && (
+              <Link
+                href="/Create/Class"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <PenTool className="h-5 w-5 flex-shrink-0" />
+                <span className="font-medium truncate">Create</span>
+              </Link>
+            )}
           </nav>
         </div>
       </div>

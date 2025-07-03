@@ -1,8 +1,22 @@
-'use client';
-
+"use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { BookOpen, Video, VideoOff, Link2, NotebookPen, StickyNote, ClipboardList, Paperclip, Bold, Italic, AlignLeft, AlignRight, AlignCenter, Underline as UnderlineIcon } from "lucide-react";
+import {
+    BookOpen,
+    Video,
+    VideoOff,
+    Link2,
+    NotebookPen,
+    StickyNote,
+    ClipboardList,
+    Paperclip,
+    Bold,
+    Italic,
+    AlignLeft,
+    AlignRight,
+    AlignCenter,
+    Underline as UnderlineIcon,
+} from "lucide-react";
 import {
     Select,
     SelectTrigger,
@@ -12,13 +26,12 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { UserState } from "@/types/userstate";
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import TextAlign from '@tiptap/extension-text-align';
-import { Underline } from '@tiptap/extension-underline';
-
-
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import TextAlign from "@tiptap/extension-text-align";
+import { Underline } from "@tiptap/extension-underline";
 
 const dummyCourses = [
     { id: "1", name: "xyz" },
@@ -26,12 +39,14 @@ const dummyCourses = [
     { id: "3", name: "pqr" },
 ];
 
-const Classes = () => {
+export default function Classes() {
     const [title, setTitle] = useState("");
     const [liveLink, setLiveLink] = useState("");
     const [recordedLink, setRecordedLink] = useState("");
     const [courseId, setCourseId] = useState("");
-    const token = useSelector((state: any) => state.user.accesstoken);
+    const token = useSelector(
+        (state: { user: UserState }) => state.user.accessToken
+    );
 
     const [assignments, setAssignments] = useState<string[]>([]);
     const [assignmentInput, setAssignmentInput] = useState("");
@@ -41,17 +56,16 @@ const Classes = () => {
 
     const [noteHtml, setNoteHtml] = useState("");
 
-
-
     useEffect(() => {
         console.log(token);
-        if (!token) toast.error('user is not authenticated');
+        if (!token) toast.error("user is not authenticated");
     }, [token]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!title || !courseId) return toast.error("Please fill in title and course.");
+        if (!title || !courseId)
+            return toast.error("Please fill in title and course.");
         if ((liveLink && recordedLink) || (!liveLink && !recordedLink)) {
             return toast.error("Fill either Live or Recorded Link (not both).");
         }
@@ -73,10 +87,9 @@ const Classes = () => {
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
                 classData,
                 {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 }
             );
-
 
             // 2. Add Notes
             if (noteHtml) {
@@ -99,44 +112,48 @@ const Classes = () => {
             }
 
             // 3. Add Attachments
-            await Promise.all(attachments.map(async (link) => {
-                try {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${courseId}`,
-                        {
-                            attachment: link,
-                            courseId,
-                        },
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
+            await Promise.all(
+                attachments.map(async (link) => {
+                    try {
+                        await axios.post(
+                            `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${courseId}`,
+                            {
+                                attachment: link,
+                                courseId,
                             },
-                        }
-                    );
-                } catch (err: any) {
-                    console.error("Attachment error:", err);
-                }
-            }));
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            }
+                        );
+                    } catch (err: any) {
+                        console.error("Attachment error:", err);
+                    }
+                })
+            );
 
             // 4. Add Assignments
-            await Promise.all(assignments.map(async (link) => {
-                try {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${courseId}`,
-                        {
-                            assignments: link,
-                            courseId,
-                        },
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
+            await Promise.all(
+                assignments.map(async (link) => {
+                    try {
+                        await axios.post(
+                            `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${courseId}`,
+                            {
+                                assignments: link,
+                                courseId,
                             },
-                        }
-                    );
-                } catch (err) {
-                    console.error("Assignment error:", err);
-                }
-            }));
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            }
+                        );
+                    } catch (err) {
+                        console.error("Assignment error:", err);
+                    }
+                })
+            );
 
             toast.success("Class, notes, attachments, and assignments created!");
 
@@ -150,13 +167,12 @@ const Classes = () => {
                 setAssignments([]);
                 setAttachmentInput("");
                 setAttachments([]);
-                editor?.commands.setContent('');
+                editor?.commands.setContent("");
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Failed to create class.");
         }
     };
-
 
     const countWords = (text: string) => {
         return text.trim().split(/\s+/).filter(Boolean).length;
@@ -167,7 +183,7 @@ const Classes = () => {
             StarterKit,
             Underline,
             TextAlign.configure({
-                types: ['heading', 'paragraph'],
+                types: ["heading", "paragraph"],
             }),
         ],
         content: noteHtml,
@@ -181,7 +197,6 @@ const Classes = () => {
             }
         },
     });
-
 
     return (
         <div className="max-w-xl ml-4 md:ml-10 mt-10 bg-white p-6 rounded-xl">
@@ -255,7 +270,6 @@ const Classes = () => {
                     </Select>
                 </div>
 
-
                 {/* Notes Section */}
                 <div>
                     <label className="text-sm font-medium text-gray-600 flex items-center gap-1 mb-1">
@@ -265,22 +279,44 @@ const Classes = () => {
 
                     {/* Editor Toolbar */}
                     <div className="flex flex-wrap items-center gap-2 mb-2 text-gray-700">
-                        <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()}>
+                        <button
+                            type="button"
+                            onClick={() => editor?.chain().focus().toggleBold().run()}
+                        >
                             <Bold className="w-4 h-4" />
                         </button>
-                        <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()}>
+                        <button
+                            type="button"
+                            onClick={() => editor?.chain().focus().toggleItalic().run()}
+                        >
                             <Italic className="w-4 h-4" />
                         </button>
-                        <button type="button" onClick={() => editor?.chain().focus().toggleUnderline().run()}>
+                        <button
+                            type="button"
+                            onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                        >
                             <UnderlineIcon className="w-4 h-4" />
                         </button>
-                        <button type="button" onClick={() => editor?.chain().focus().setTextAlign("left").run()}>
+                        <button
+                            type="button"
+                            onClick={() => editor?.chain().focus().setTextAlign("left").run()}
+                        >
                             <AlignLeft className="w-4 h-4" />
                         </button>
-                        <button type="button" onClick={() => editor?.chain().focus().setTextAlign("center").run()}>
+                        <button
+                            type="button"
+                            onClick={() =>
+                                editor?.chain().focus().setTextAlign("center").run()
+                            }
+                        >
                             <AlignCenter className="w-4 h-4" />
                         </button>
-                        <button type="button" onClick={() => editor?.chain().focus().setTextAlign("right").run()}>
+                        <button
+                            type="button"
+                            onClick={() =>
+                                editor?.chain().focus().setTextAlign("right").run()
+                            }
+                        >
                             <AlignRight className="w-4 h-4" />
                         </button>
                     </div>
@@ -294,7 +330,6 @@ const Classes = () => {
                         {countWords(editor?.getText() || "")}/100 words
                     </p>
                 </div>
-
 
                 {/* Assignments */}
                 <div>
@@ -324,7 +359,9 @@ const Classes = () => {
                         </button>
                     </div>
                     <ul className="list-decimal pl-5 text-sm text-gray-500 font-bold space-y-1">
-                        {assignments.map((a, i) => <li key={i}>{a}</li>)}
+                        {assignments.map((a, i) => (
+                            <li key={i}>{a}</li>
+                        ))}
                     </ul>
                 </div>
 
@@ -356,7 +393,9 @@ const Classes = () => {
                         </button>
                     </div>
                     <ul className="list-decimal pl-5 text-sm text-gray-500 font-bold space-y-1">
-                        {attachments.map((a, i) => <li key={i}>{a}</li>)}
+                        {attachments.map((a, i) => (
+                            <li key={i}>{a}</li>
+                        ))}
                     </ul>
                 </div>
 
@@ -372,6 +411,4 @@ const Classes = () => {
             </form>
         </div>
     );
-};
-
-export default Classes;
+}
