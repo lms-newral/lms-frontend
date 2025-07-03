@@ -4,20 +4,28 @@ import axios from "axios";
 import { toast } from "sonner";
 import { FaBookOpen, FaAlignLeft, FaImage } from "react-icons/fa";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
+import { UserState } from "@/types/userstate";
 
 export default function CreateCoursePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [fileName, setFileName] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [cloudinaryImageUrl, setCloudinaryImageUrl] = useState<string>("");
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const CLOUDINARY_UPLOAD_PRESET =
+    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_THUMBNAIL;
+  const user = useSelector((state: { user: UserState }) => state.user);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file
     if (!file.type.startsWith("image/")) {
       toast.error("Please select a valid image file");
       return;
@@ -28,9 +36,39 @@ export default function CreateCoursePage() {
       return;
     }
 
-    setImageFile(file);
+    // Set preview and filename immediately
     setThumbnail(URL.createObjectURL(file));
     setFileName(file.name);
+    setUploadingImage(true);
+
+    try {
+      // Upload to Cloudinary
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: uploadData,
+        }
+      );
+
+      if (!response.ok) throw new Error("Upload failed");
+
+      const data = await response.json();
+      setCloudinaryImageUrl(data.secure_url);
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image. Please try again.");
+      // Clear the preview if upload fails
+      setThumbnail("");
+      setFileName("");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleBrowseClick = () => {
@@ -40,33 +78,46 @@ export default function CreateCoursePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !imageFile) {
+    if (!title || !cloudinaryImageUrl) {
       toast.error("Title and Thumbnail are required.");
+      return;
+    }
+
+    if (uploadingImage) {
+      toast.error("Please wait for the image to finish uploading.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("thumbnail", imageFile);
+      const requestData = {
+        title,
+        description,
+        thumbnail: cloudinaryImageUrl, // Send Cloudinary URL instead of file
+      };
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/create/course`,
-        formData,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}course`,
+        requestData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${user.accessToken}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      if (response.status == 200) {
+      if (response.status === 201) {
         toast.success("Course created successfully!");
+        // Reset form
+        setTitle("");
+        setDescription("");
+        setThumbnail("");
+        setFileName("");
+        setCloudinaryImageUrl("");
       } else {
-        toast.error(response.status || "Failed to create course");
+        toast.error("Failed to create course");
       }
     } catch (error: any) {
       console.error(error);
@@ -77,7 +128,7 @@ export default function CreateCoursePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 ">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
         className="bg-white shadow-lg p-6 rounded-lg w-full max-w-4xl"
@@ -116,7 +167,7 @@ export default function CreateCoursePage() {
         </div>
 
         <div className="mb-4">
-          <label className=" mb-1 font-medium flex items-center gap-2">
+          <label className="mb-1 font-medium flex items-center gap-2">
             <FaImage className="text-blue-600" />
             Upload Thumbnail Image*
           </label>
@@ -124,13 +175,21 @@ export default function CreateCoursePage() {
           {thumbnail ? (
             <div
               onClick={handleBrowseClick}
-              className="w-full h-52 rounded-md border overflow-hidden cursor-pointer"
+              className="w-full h-52 rounded-md border overflow-hidden cursor-pointer relative"
             >
               <img
                 src={thumbnail}
                 alt="Thumbnail Preview"
                 className="w-full h-full object-cover hover:opacity-90 transition"
               />
+              {uploadingImage && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                    <p>Uploading...</p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div
@@ -143,6 +202,7 @@ export default function CreateCoursePage() {
               </p>
             </div>
           )}
+
           <input
             type="text"
             value={fileName}
@@ -159,12 +219,17 @@ export default function CreateCoursePage() {
             required
           />
         </div>
+
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 rounded-lg text-white py-2  hover:bg-blue-700"
+          disabled={loading || uploadingImage || !cloudinaryImageUrl}
+          className="w-full bg-blue-600 rounded-lg text-white py-2 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Creating..." : "Create Course"}
+          {loading
+            ? "Creating..."
+            : uploadingImage
+            ? "Uploading Image..."
+            : "Create Course"}
         </button>
       </form>
     </div>

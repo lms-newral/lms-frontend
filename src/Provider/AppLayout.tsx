@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser, setCourse } from "@/store/slices/userSlice";
@@ -8,23 +8,21 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header/Header";
 import AppSidebar from "@/components/Sidebar/AppSidebar";
 import DashboardHeader from "@/components/Dashboard/DashboardHeader";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const path = usePathname();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-  const params = useParams();
 
   useEffect(() => {
     const refreshToken = async () => {
       const token = localStorage.getItem("refreshToken");
       const storedCourseId = localStorage.getItem("courseId");
-
       if (!token) {
         setIsLoading(false);
         return;
       }
-
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}auth/refresh`,
@@ -39,9 +37,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           })
         );
 
-        // add all the routes in the sidebar here like attachments, notes, etc when you build them
-
+        // Course logic remains the same
         if (
+          path === "/" ||
           path === "/Dashboard" ||
           path === "/Classes" ||
           path === "/Notes" ||
@@ -49,12 +47,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           path === "/Attachments"
         ) {
           let courseIdToSet = storedCourseId;
-
           if (!storedCourseId) {
             try {
               const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${response.data.user.id}`;
               const courseResponse = await axios.get(url);
-
               if (courseResponse.data && courseResponse.data.length > 0) {
                 courseIdToSet = courseResponse.data[0].course.id;
                 localStorage.setItem("courseId", courseIdToSet || "");
@@ -64,12 +60,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             }
           }
 
-          // Set course if we have one
           if (courseIdToSet) {
             dispatch(setCourse(courseIdToSet));
           }
         }
-
         localStorage.setItem("refreshToken", response.data.refreshToken);
       } catch (error) {
         console.error("Refresh token error:", error);
@@ -79,7 +73,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     };
-
     refreshToken();
   }, [dispatch, path]);
 
@@ -92,7 +85,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (path === "/") {
+  // Public routes (no authentication required)
+  if (path === "/" || path === "/Signin" || path === "/Signup") {
     return (
       <>
         <Header />
@@ -102,25 +96,58 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     );
   }
 
+  // Admin-only routes
+  if (path.startsWith("/Create")) {
+    return (
+      <ProtectedRoute allowedRoles={["admin"]} redirectTo="/Dashboard">
+        <div className="min-h-screen flex w-full">
+          <main className="flex-1 lg:ml-0">
+            <DashboardHeader />
+            {children}
+          </main>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // Teacher-only routes
+  if (path.startsWith("/teacher")) {
+    return (
+      <ProtectedRoute
+        allowedRoles={["teacher", "admin"]}
+        redirectTo="/Dashboard"
+      >
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <main className="flex-1 lg:ml-0">
+            <DashboardHeader />
+            {children}
+          </main>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // Protected dashboard routes (requires authentication)
   if (
     path === "/Dashboard" ||
     path === "/Courses" ||
     path === "/Classes" ||
-    path === `/Classes/${params.id}` ||
-    path === `/Notes` ||
+    path.startsWith("/Classes/") ||
+    path === "/Notes" ||
     path === "/Assignments" ||
     path === "/Attachments"
   ) {
     return (
-      <div className="min-h-screen flex w-full">
-        <AppSidebar />
-        <main className="flex-1 lg:ml-0">
-          {/* Main content area */}
-          <DashboardHeader />
-          {children}
-          {/*<Footer />*/}
-        </main>
-      </div>
+      <ProtectedRoute>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <main className="flex-1 lg:ml-0">
+            <DashboardHeader />
+            {children}
+          </main>
+        </div>
+      </ProtectedRoute>
     );
   }
 

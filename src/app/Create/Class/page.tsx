@@ -1,22 +1,29 @@
 "use client";
+
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import { toast } from "sonner";
+
 import {
-    BookOpen,
-    Video,
-    VideoOff,
-    Link2,
-    NotebookPen,
-    StickyNote,
-    ClipboardList,
-    Paperclip,
-    Bold,
-    Italic,
-    AlignLeft,
-    AlignRight,
-    AlignCenter,
-    Underline as UnderlineIcon,
+
+  BookOpen,
+  Video,
+  VideoOff,
+  Link2,
+  NotebookPen,
+  StickyNote,
+  ClipboardList,
+  Paperclip,
+  Bold,
+  Italic,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Underline as UnderlineIcon,
 } from "lucide-react";
+
 import {
     Select,
     SelectTrigger,
@@ -24,29 +31,14 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select";
-import axios from "axios";
-import { useSelector } from "react-redux";
-import { UserState } from "@/types/userstate";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { Underline } from "@tiptap/extension-underline";
 
-const dummyCourses = [
-    { id: "1", name: "xyz" },
-    { id: "2", name: "abc" },
-    { id: "3", name: "pqr" },
-];
 
-export default function Classes() {
-    const [title, setTitle] = useState("");
-    const [liveLink, setLiveLink] = useState("");
-    const [recordedLink, setRecordedLink] = useState("");
-    const [courseId, setCourseId] = useState("");
-    const token = useSelector(
-        (state: { user: UserState }) => state.user.accessToken
-    );
+
 
     const [assignments, setAssignments] = useState<string[]>([]);
     const [assignmentInput, setAssignmentInput] = useState("");
@@ -56,359 +48,350 @@ export default function Classes() {
 
     const [noteHtml, setNoteHtml] = useState("");
 
-    useEffect(() => {
-        console.log(token);
-        if (!token) toast.error("user is not authenticated");
-    }, [token]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
 
-        if (!title || !courseId)
-            return toast.error("Please fill in title and course.");
-        if ((liveLink && recordedLink) || (!liveLink && !recordedLink)) {
-            return toast.error("Fill either Live or Recorded Link (not both).");
-        }
+  /* ──────────────── fetch courses ──────────────── */
+  useEffect(() => {
+    if (!user.accessToken) {
+      toast.error("User is not authenticated");
+      router.push("/");
+      return;
+    }
 
-        const classData = {
-            title,
-            videoLink: recordedLink || "",
-            zoomLink: liveLink || "",
-            isLive: !!liveLink,
-            isRecorded: !!recordedLink,
-            notes: noteHtml,
-            assignments,
-            attachments,
-        };
-
+    async function getCourses() {
+      if (["ADMIN", "SUPER_ADMIN"].includes(user.user?.role ?? "")) {
         try {
-            // 1. Create class
-            const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
-                classData,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}course`
+          );
+          setCourses(res.data);
+        } catch {
+          toast.error("Could not fetch courses");
+        }
+      }
+    }
 
-            // 2. Add Notes
-            if (noteHtml) {
-                try {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${courseId}`,
-                        {
-                            notesHtml: noteHtml,
-                            courseId,
-                        },
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        }
-                    );
-                } catch (err) {
-                    console.error("Notes error:", err);
-                }
-            }
+    getCourses();
+  }, [user, router]);
 
-            // 3. Add Attachments
-            await Promise.all(
-                attachments.map(async (link) => {
-                    try {
-                        await axios.post(
-                            `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${courseId}`,
-                            {
-                                attachment: link,
-                                courseId,
-                            },
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            }
-                        );
-                    } catch (err: any) {
-                        console.error("Attachment error:", err);
-                    }
-                })
-            );
+  /* ──────────────── TipTap editor setup ──────────────── */
+  const countWords = (t: string) =>
+    t.trim().split(/\s+/).filter(Boolean).length;
 
-            // 4. Add Assignments
-            await Promise.all(
-                assignments.map(async (link) => {
-                    try {
-                        await axios.post(
-                            `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${courseId}`,
-                            {
-                                assignments: link,
-                                courseId,
-                            },
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            }
-                        );
-                    } catch (err) {
-                        console.error("Assignment error:", err);
-                    }
-                })
-            );
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
+    content: noteHtml,
+    onUpdate: ({ editor }) => {
+      const text = editor.getText();
+      if (countWords(text) <= 100) {
+        setNoteHtml(editor.getHTML());
+      } else {
+        editor.commands.setContent(noteHtml, false); // revert if >100 words
+      }
+    },
+  });
+
+  /* ──────────────── submit handler ──────────────── */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    /* basic validations */
+    if (!title || !courseId)
+      return toast.error("Please fill in title and course.");
+    if ((liveLink && recordedLink) || (!liveLink && !recordedLink))
+      return toast.error("Fill either Live or Recorded Link (not both).");
+
+    const classPayload = {
+      title,
+      videoLink: recordedLink || "",
+      zoomLink: liveLink || "",
+      isLive: !!liveLink,
+      isRecorded: !!recordedLink,
+      notes: noteHtml, // (optional: your backend may ignore)
+      assignments,
+      attachments,
+    };
+
+    try {
+      /* 1️⃣  Create class */
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
+        classPayload,
+        { headers: { Authorization: `Bearer ${user.accessToken}` } }
+      );
+
+      /* Grab the classId returned by the backend */
+      const classId =
+        res.data?.data?.id ?? res.data?.data?.classId ?? res.data?.classId;
+      if (!classId) throw new Error("classId not returned from backend");
+
+      /* 2️⃣  Create note (HTML) */
+      if (noteHtml) {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${classId}`,
+          { notesHtml: noteHtml },
+          { headers: { Authorization: `Bearer ${user.accessToken}` } }
+        );
+      }
+
+      /* 3️⃣  Create attachments */
+      await Promise.all(
+        attachments.map((link) =>
+          axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${classId}`,
+            { attachment: link },
+            { headers: { Authorization: `Bearer ${user.accessToken}` } }
+          )
+        )
+      );
+
+      /* 4️⃣  Create assignments */
+      await Promise.all(
+        assignments.map((link) =>
+          axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${classId}`,
+            { assignment: link },
+            { headers: { Authorization: `Bearer ${user.accessToken}` } }
+          )
+        )
+      );
+
 
             toast.success("Class, notes, attachments, and assignments created!");
 
-            // 5. Reset form
-            if (res.status === 201 || res.status === 200) {
-                setTitle("");
-                setLiveLink("");
-                setRecordedLink("");
-                setCourseId("");
-                setAssignmentInput("");
-                setAssignments([]);
-                setAttachmentInput("");
-                setAttachments([]);
-                editor?.commands.setContent("");
-            }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to create class.");
-        }
-    };
 
-    const countWords = (text: string) => {
-        return text.trim().split(/\s+/).filter(Boolean).length;
-    };
+      /* reset form */
+      setTitle("");
+      setLiveLink("");
+      setRecordedLink("");
+      setCourseId("");
+      setAssignmentInput("");
+      setAssignments([]);
+      setAttachmentInput("");
+      setAttachments([]);
+      editor?.commands.setContent("");
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.message || err.message || "Failed to create class."
+      );
+    }
+  };
 
-    const editor = useEditor({
-        extensions: [
-            StarterKit,
-            Underline,
-            TextAlign.configure({
-                types: ["heading", "paragraph"],
-            }),
-        ],
-        content: noteHtml,
-        onUpdate: ({ editor }) => {
-            const text = editor.getText();
-            const words = countWords(text);
-            if (words <= 100) {
-                setNoteHtml(editor.getHTML());
-            } else {
-                editor.commands.setContent(noteHtml, false); // revert
-            }
-        },
-    });
+  /* -------------------------------------------------- */
+  /* -------------------  RENDER  ---------------------- */
+  /* -------------------------------------------------- */
+  return (
+    <div className="mx-auto mt-10 w-full max-w-2xl rounded-xl bg-white p-6 ">
+      <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
+        <NotebookPen className="h-5 w-5 text-blue-600" />
+        Create a Class
+      </h2>
 
-    return (
-        <div className="max-w-xl ml-4 md:ml-10 mt-10 bg-white p-6 rounded-xl">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-                <NotebookPen className="w-5 h-5 text-blue-600" />
-                Create a Class
-            </h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* title */}
+        <div>
+          <label className="flex items-center gap-1 text-sm font-medium">
+            <BookOpen className="h-4 w-4 text-blue-600" />
+            Title <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="text"
+            className="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Title */}
-                <div>
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                        <BookOpen className="w-4 h-4 text-blue-600" />
-                        Title*
-                    </label>
-                    <input
-                        type="text"
-                        className="mt-1 w-full border rounded-lg p-2 bg-gray-100"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    />
-                </div>
+        {/* links */}
+        <div>
+          <label className="flex items-center gap-1 text-sm font-medium">
+            <Link2 className="h-4 w-4 text-blue-600" />
+            Live Class Link
+          </label>
+          <input
+            type="url"
+            className="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+            value={liveLink}
+            onChange={(e) => setLiveLink(e.target.value)}
+            disabled={!!recordedLink}
+            placeholder="https://zoom.us/..."
+          />
+        </div>
 
-                {/* Live/Recorded Links */}
-                <div>
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                        <Link2 className="w-4 h-4 text-blue-600" />
-                        Live Class Link
-                    </label>
-                    <input
-                        type="url"
-                        className="mt-1 w-full border rounded-lg p-2 bg-gray-100"
-                        value={liveLink}
-                        onChange={(e) => setLiveLink(e.target.value)}
-                        disabled={!!recordedLink}
-                    />
-                </div>
+        <div>
+          <label className="flex items-center gap-1 text-sm font-medium">
+            <Video className="h-4 w-4 text-blue-600" />
+            Recorded Video Link
+          </label>
+          <input
+            type="url"
+            className="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+            value={recordedLink}
+            onChange={(e) => setRecordedLink(e.target.value)}
+            disabled={!!liveLink}
+            placeholder="https://youtube.com/..."
+          />
+        </div>
 
-                <div>
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                        <Video className="w-4 h-4 text-blue-600" />
-                        Recorded Video Link
-                    </label>
-                    <input
-                        type="url"
-                        className="mt-1 w-full border rounded-lg p-2 bg-gray-100"
-                        value={recordedLink}
-                        onChange={(e) => setRecordedLink(e.target.value)}
-                        disabled={!!liveLink}
-                    />
-                </div>
+        {/* course select */}
+        <div>
+          <label className="flex items-center gap-1 text-sm font-medium">
+            <VideoOff className="h-4 w-4 text-blue-600" />
+            Select Course <span className="text-red-600">*</span>
+          </label>
+          <Select value={courseId} onValueChange={setCourseId}>
+            <SelectTrigger className="mt-2 w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+              <SelectValue placeholder="-- Select a course --" />
+            </SelectTrigger>
+            <SelectContent className="max-h-60 overflow-y-auto">
+              {courses.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-                {/* Course Select */}
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                        <VideoOff className="w-4 h-4 text-blue-600" />
-                        Select Course*
-                    </label>
-                    <Select value={courseId} onValueChange={setCourseId}>
-                        <SelectTrigger className="w-full bg-gray-100 text-gray-700">
-                            <SelectValue placeholder="-- Select a course --" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {dummyCourses.map((course) => (
-                                <SelectItem key={course.id} value={course.id}>
-                                    {course.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+        {/* notes (TipTap) */}
+        <div>
+          <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+            <StickyNote className="h-4 w-4 text-blue-600" />
+            Notes (max 100 words)
+          </label>
 
-                {/* Notes Section */}
-                <div>
-                    <label className="text-sm font-medium text-gray-600 flex items-center gap-1 mb-1">
-                        <StickyNote className="w-4 h-4 text-blue-600" />
-                        Notes
-                    </label>
+          {/* toolbar */}
+          <div className="mb-2 flex flex-wrap items-center gap-2 text-gray-700">
+            {[
+              {
+                Icon: Bold,
+                action: () => editor?.chain().focus().toggleBold().run(),
+              },
+              {
+                Icon: Italic,
+                action: () => editor?.chain().focus().toggleItalic().run(),
+              },
+              {
+                Icon: UnderlineIcon,
+                action: () => editor?.chain().focus().toggleUnderline().run(),
+              },
+              {
+                Icon: AlignLeft,
+                action: () =>
+                  editor?.chain().focus().setTextAlign("left").run(),
+              },
+              {
+                Icon: AlignCenter,
+                action: () =>
+                  editor?.chain().focus().setTextAlign("center").run(),
+              },
+              {
+                Icon: AlignRight,
+                action: () =>
+                  editor?.chain().focus().setTextAlign("right").run(),
+              },
+            ].map(({ Icon, action }, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={action}
+                className="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <Icon className="h-4 w-4" />
+              </button>
+            ))}
+          </div>
 
-                    {/* Editor Toolbar */}
-                    <div className="flex flex-wrap items-center gap-2 mb-2 text-gray-700">
-                        <button
-                            type="button"
-                            onClick={() => editor?.chain().focus().toggleBold().run()}
-                        >
-                            <Bold className="w-4 h-4" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => editor?.chain().focus().toggleItalic().run()}
-                        >
-                            <Italic className="w-4 h-4" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => editor?.chain().focus().toggleUnderline().run()}
-                        >
-                            <UnderlineIcon className="w-4 h-4" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => editor?.chain().focus().setTextAlign("left").run()}
-                        >
-                            <AlignLeft className="w-4 h-4" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() =>
-                                editor?.chain().focus().setTextAlign("center").run()
-                            }
-                        >
-                            <AlignCenter className="w-4 h-4" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() =>
-                                editor?.chain().focus().setTextAlign("right").run()
-                            }
-                        >
-                            <AlignRight className="w-4 h-4" />
-                        </button>
-                    </div>
+          <div className="min-h-[200px] rounded-lg border border-gray-300 bg-gray-50 p-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500">
+            <EditorContent editor={editor} className="min-h-[150px]" />
+          </div>
+          <p className="mt-1 text-right text-xs text-gray-500">
+            {countWords(editor?.getText() ?? "")}/100 words
+          </p>
+        </div>
 
-                    {/* Editor Box */}
-                    <div className="border bg-gray-100 text-black p-2 rounded-md min-h-[200px]">
-                        <EditorContent editor={editor} className="min-h-[150px]" />
-                    </div>
+        {/* assignments */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            <ClipboardList className="mr-1 inline h-4 w-4 text-blue-600" />
+            Assignments
+          </label>
+          <div className="mb-2 flex items-center gap-2">
+            <input
+              type="text"
+              className="flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              value={assignmentInput}
+              onChange={(e) => setAssignmentInput(e.target.value)}
+              placeholder="Enter assignment details"
+            />
+            <button
+              type="button"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              onClick={() => {
+                if (assignmentInput.trim()) {
+                  setAssignments((p) => [...p, assignmentInput.trim()]);
+                  setAssignmentInput("");
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+          <ul className="space-y-1 list-decimal pl-5 text-sm text-gray-600">
+            {assignments.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        </div>
 
-                    <p className="text-xs text-gray-500 text-right mt-1">
-                        {countWords(editor?.getText() || "")}/100 words
-                    </p>
-                </div>
+        {/* attachments */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            <Paperclip className="mr-1 inline h-4 w-4 text-blue-600" />
+            Attachments
+          </label>
+          <div className="mb-2 flex items-center gap-2">
+            <input
+              type="text"
+              className="flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              value={attachmentInput}
+              onChange={(e) => setAttachmentInput(e.target.value)}
+              placeholder="Enter attachment link"
+            />
+            <button
+              type="button"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              onClick={() => {
+                if (attachmentInput.trim()) {
+                  setAttachments((p) => [...p, attachmentInput.trim()]);
+                  setAttachmentInput("");
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+          <ul className="break-all space-y-1 list-decimal pl-5 text-sm text-gray-600">
+            {attachments.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        </div>
 
-                {/* Assignments */}
-                <div>
-                    <label className="text-sm font-medium text-gray-600 block mb-1">
-                        <ClipboardList className="w-4 h-4 text-blue-600" />
-                        Assignments
-                    </label>
-                    <div className="flex items-center gap-2 mb-2">
-                        <input
-                            type="text"
-                            className="flex-1 border rounded-lg p-2 bg-gray-100"
-                            value={assignmentInput}
-                            onChange={(e) => setAssignmentInput(e.target.value)}
-                            placeholder="Enter assignment details"
-                        />
-                        <button
-                            type="button"
-                            className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                            onClick={() => {
-                                if (assignmentInput.trim()) {
-                                    setAssignments((prev) => [...prev, assignmentInput]);
-                                    setAssignmentInput("");
-                                }
-                            }}
-                        >
-                            Add
-                        </button>
-                    </div>
-                    <ul className="list-decimal pl-5 text-sm text-gray-500 font-bold space-y-1">
-                        {assignments.map((a, i) => (
-                            <li key={i}>{a}</li>
-                        ))}
-                    </ul>
-                </div>
+        {/* submit */}
+        <div className="text-right">
+          <button
+            type="submit"
+            className="rounded-lg w-full bg-blue-600 px-5 py-2 text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          >
+            Create Class
+          </button>
 
-                {/* Attachments */}
-                <div>
-                    <label className="text-sm font-medium text-gray-600 block mb-1">
-                        <Paperclip className="w-4 h-4 text-blue-600" />
-                        Attachments
-                    </label>
-                    <div className="flex items-center gap-2 mb-2">
-                        <input
-                            type="text"
-                            className="flex-1 border rounded-lg p-2 bg-gray-100"
-                            value={attachmentInput}
-                            onChange={(e) => setAttachmentInput(e.target.value)}
-                            placeholder="Enter attachment link"
-                        />
-                        <button
-                            type="button"
-                            className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                            onClick={() => {
-                                if (attachmentInput.trim()) {
-                                    setAttachments((prev) => [...prev, attachmentInput]);
-                                    setAttachmentInput("");
-                                }
-                            }}
-                        >
-                            Add
-                        </button>
-                    </div>
-                    <ul className="list-decimal pl-5 text-sm text-gray-500 font-bold space-y-1">
-                        {attachments.map((a, i) => (
-                            <li key={i}>{a}</li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Submit */}
-                <div className="text-right">
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-150"
-                    >
-                        Create Class
-                    </button>
-                </div>
-            </form>
         </div>
     );
 }

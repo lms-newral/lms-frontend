@@ -1,7 +1,9 @@
 "use client";
 
 import { Classes, Course, CourseEnrollment } from "@/types/DataTypes";
-import { BookOpen, Calendar, Play } from "lucide-react";
+
+import { BookOpen, Calendar, Divide, Play } from "lucide-react";
+
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -17,12 +19,14 @@ interface User {
 }
 
 export default function DashboardContent(props: props) {
+
   const { user, courses, classes, selectedCourse } = props;
 
   const OverviewTab = () => (
     <div className="space-y-6">
       {/* Selected Course Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
         <div className="bg-white rounded-lg shadow p-6 col-span-3 overflow-x-auto">
           <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -52,6 +56,7 @@ export default function DashboardContent(props: props) {
                 </span>
               )}
             </div>
+
           </div>
         </div>
 
