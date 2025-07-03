@@ -30,7 +30,6 @@ const Header = () => {
     router.push("/");
   };
 
-
   useEffect(() => {
     if (headerRef.current) {
       gsap.fromTo(
@@ -41,9 +40,7 @@ const Header = () => {
     }
   }, []);
 
-
   return (
-
     <>
       <header
         ref={headerRef}
@@ -57,10 +54,30 @@ const Header = () => {
             lms<span className="text-blue-600">.</span>
           </Link>
           <nav className="hidden md:flex gap-4 md:gap-6 text-sm md:text-base lg:text-lg">
-            <a href="#features" className="text-gray-600 hover:text-blue-600 transition">Features</a>
-            <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition">Pricing</a>
-            <a href="#about" className="text-gray-600 hover:text-blue-600 transition">About</a>
-            <a href="#contact" className="text-gray-600 hover:text-blue-600 transition">Contact</a>
+            <a
+              href="#features"
+              className="text-gray-600 hover:text-blue-600 transition"
+            >
+              Features
+            </a>
+            <a
+              href="#pricing"
+              className="text-gray-600 hover:text-blue-600 transition"
+            >
+              Pricing
+            </a>
+            <a
+              href="#about"
+              className="text-gray-600 hover:text-blue-600 transition"
+            >
+              About
+            </a>
+            <a
+              href="#contact"
+              className="text-gray-600 hover:text-blue-600 transition"
+            >
+              Contact
+            </a>
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -71,7 +88,11 @@ const Header = () => {
               className="block md:hidden p-2 text-blue-600 hover:bg-blue-50"
               aria-label="Toggle Menu"
             >
-              {isOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+              {isOpen ? (
+                <FiX className="w-5 h-5" />
+              ) : (
+                <FiMenu className="w-5 h-5" />
+              )}
             </Button>
 
             {isAuthenticated ? (
@@ -99,16 +120,41 @@ const Header = () => {
       {isOpen && (
         <div className="fixed top-[3.5rem] left-0 right-0 z-40 bg-white border-b shadow-md rounded-b-xl min-h-[40vh] max-h-[60vh] overflow-y-auto transition-all duration-500 animate-in slide-in-from-top px-6 py-4">
           <nav className="flex flex-col gap-4 text-gray-700 text-base sm:text-lg">
-            <a href="#features" onClick={() => setIsOpen(false)} className="hover:text-blue-600">Features</a>
-            <a href="#pricing" onClick={() => setIsOpen(false)} className="hover:text-blue-600">Pricing</a>
-            <a href="#about" onClick={() => setIsOpen(false)} className="hover:text-blue-600">About</a>
-            <a href="#contact" onClick={() => setIsOpen(false)} className="hover:text-blue-600">Contact</a>
+            <a
+              href="#features"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-blue-600"
+            >
+              Features
+            </a>
+            <a
+              href="#pricing"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-blue-600"
+            >
+              Pricing
+            </a>
+            <a
+              href="#about"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-blue-600"
+            >
+              About
+            </a>
+            <a
+              href="#contact"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-blue-600"
+            >
+              Contact
+            </a>
 
             <div className="pt-6">
               <Link
-                href="/Signin"
+                href={user ? "/Dashboard" : "Signin"}
                 onClick={() => setIsOpen(false)}
-                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition">
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition"
+              >
                 Explore
               </Link>
             </div>

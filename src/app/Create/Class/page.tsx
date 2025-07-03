@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -35,12 +34,23 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { Underline } from "@tiptap/extension-underline";
-import { UserState } from "@/types/userstate";
 
-export default function CreateClass() {
+import { UserState } from "@/types/userstate";
+import { Course } from "@/types/DataTypes";
+
+/* -------------------------------------------------- */
+
+export default function Classes() {
   const router = useRouter();
   const user = useSelector((state: { user: UserState }) => state.user);
 
+  /* ──────────────── local state ──────────────── */
+  const [title, setTitle] = useState("");
+  const [liveLink, setLiveLink] = useState("");
+  const [recordedLink, setRecordedLink] = useState("");
+  const [courseId, setCourseId] = useState("");
+
+  const [courses, setCourses] = useState<Course[]>([]);
 
   const [assignments, setAssignments] = useState<string[]>([]);
   const [assignmentInput, setAssignmentInput] = useState("");
@@ -50,15 +60,9 @@ export default function CreateClass() {
 
   const [noteHtml, setNoteHtml] = useState("");
 
-  const [title, setTitle] = useState("");
-  const [liveLink, setLiveLink] = useState("");
-  const [recordedLink, setRecordedLink] = useState("");
-  const [courseId, setCourseId] = useState("");
-  const [courses, setCourses] = useState<any[]>([]);
-
-  // Fetch courses
+  /* ──────────────── fetch courses ──────────────── */
   useEffect(() => {
-    if (!user?.accessToken) {
+    if (!user.accessToken) {
       toast.error("User is not authenticated");
       router.push("/");
       return;
@@ -68,8 +72,7 @@ export default function CreateClass() {
       if (["ADMIN", "SUPER_ADMIN"].includes(user.user?.role ?? "")) {
         try {
           const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}course`,
-            { headers: { Authorization: `Bearer ${user.accessToken}` } }
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}course`
           );
           setCourses(res.data);
         } catch {
@@ -81,6 +84,7 @@ export default function CreateClass() {
     getCourses();
   }, [user, router]);
 
+  /* ──────────────── TipTap editor setup ──────────────── */
   const countWords = (t: string) =>
     t.trim().split(/\s+/).filter(Boolean).length;
 
@@ -101,9 +105,11 @@ export default function CreateClass() {
     },
   });
 
+  /* ──────────────── submit handler ──────────────── */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    /* basic validations */
     if (!title || !courseId)
       return toast.error("Please fill in title and course.");
     if ((liveLink && recordedLink) || (!liveLink && !recordedLink))
@@ -115,22 +121,25 @@ export default function CreateClass() {
       zoomLink: liveLink || "",
       isLive: !!liveLink,
       isRecorded: !!recordedLink,
-      notes: noteHtml,
+      notes: noteHtml, // (optional: your backend may ignore)
       assignments,
       attachments,
     };
 
     try {
+      /* 1️⃣  Create class */
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
         classPayload,
         { headers: { Authorization: `Bearer ${user.accessToken}` } }
       );
 
+      /* Grab the classId returned by the backend */
       const classId =
         res.data?.data?.id ?? res.data?.data?.classId ?? res.data?.classId;
       if (!classId) throw new Error("classId not returned from backend");
 
+      /* 2️⃣  Create note (HTML) */
       if (noteHtml) {
         await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${classId}`,
@@ -139,6 +148,7 @@ export default function CreateClass() {
         );
       }
 
+      /* 3️⃣  Create attachments */
       await Promise.all(
         attachments.map((link) =>
           axios.post(
@@ -149,6 +159,7 @@ export default function CreateClass() {
         )
       );
 
+      /* 4️⃣  Create assignments */
       await Promise.all(
         assignments.map((link) =>
           axios.post(
@@ -161,7 +172,7 @@ export default function CreateClass() {
 
       toast.success("Class, notes, attachments, and assignments created!");
 
-      // Reset form
+      /* reset form */
       setTitle("");
       setLiveLink("");
       setRecordedLink("");
@@ -177,6 +188,7 @@ export default function CreateClass() {
       );
     }
   };
+
   /* -------------------------------------------------- */
   /* -------------------  RENDER  ---------------------- */
   /* -------------------------------------------------- */
