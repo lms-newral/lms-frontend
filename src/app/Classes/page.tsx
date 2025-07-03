@@ -4,24 +4,11 @@ import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-
-interface ClassData {
-  id: string;
-  title: string;
-  videoLink?: string;
-  attachments: string;
-  courseId: string;
-  creatorId: string;
-  attendanceCount: number;
-  isLive: boolean;
-  isRecorded: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  zoomLink?: string;
+import { Classes } from "@/types/DataTypes";
+interface ClassData extends Classes {
+  isClient: boolean;
 }
-
-export default function Classes() {
+export default function Class() {
   const course = useSelector(
     (state: { user: UserState }) => state.user.selectedCourse
   );
@@ -95,10 +82,9 @@ export default function Classes() {
   }
   //this page is not finished yet
   return (
-    <div className="min-h-screen">
-      <div>
+    <div className="min-h-screen flex justify-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-8 justify-items-center md:justify-items-stretch">
         {classes.map((classItem) => (
-
           <div key={classItem.id}>
             <ClassCard
               isClient={isClient}
@@ -115,8 +101,12 @@ export default function Classes() {
               isActive={classItem.isActive}
               createdAt={classItem.createdAt}
               updatedAt={classItem.updatedAt}
+              description={classItem.description}
+              notes={classItem.notes}
+              assignments={classItem.assignments}
+              course={classItem.course}
+              creator={classItem.creator}
             />
-
           </div>
         ))}
       </div>

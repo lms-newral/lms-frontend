@@ -1,4 +1,5 @@
 "use client";
+import { Assignment } from "@/types/DataTypes";
 import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -7,12 +8,6 @@ import { useSelector } from "react-redux";
 interface Data {
   assignments: Assignment[];
   title: string;
-}
-
-interface Assignment {
-  id: string;
-  createdAt: string;
-  assignments: string;
 }
 
 export default function AssignmentPage() {

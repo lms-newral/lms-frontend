@@ -8,16 +8,16 @@ import {
   Menu,
   X,
   Notebook,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/Dashboard", isActive: true },
-  { title: "Announcements", icon: MessageSquare, url: "/Announcements" },
-  { title: "classes", icon: Book, url: "/Classes" },
+  { title: "Courses", icon: MessageSquare, url: "/Courses" },
+  { title: "Classes", icon: Book, url: "/Classes" },
   { title: "Assignments", icon: FileText, url: "/Assignments" },
   { title: "Attachments", icon: PenTool, url: "/Attachments" },
   { title: "Notes", icon: Notebook, url: "/Notes" },
@@ -25,9 +25,8 @@ const navigationItems = [
 
 export default function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const user = useSelector((state: any) => state.user.user);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const role = user?.role;
   return (
     <>
       {/* Mobile Menu Button */}
@@ -48,24 +47,50 @@ export default function AppSidebar() {
         />
       )}
 
+      {/* Overlay for desktop - when sidebar is expanded */}
+      {!isCollapsed && (
+        <div
+          className="hidden lg:block fixed inset-0 z-30"
+          onClick={() => setIsCollapsed(true)}
+        />
+      )}
+
       {/* Sidebar */}
       <div
         className={`
-          fixed lg:relative top-0 left-0 h-full bg-white border-r border-gray-200 z-40
-          w-64 transform transition-transform duration-300 ease-in-out
+          fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-50
+          transform transition-all duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:block
           flex flex-col
+          ${isCollapsed ? "w-16" : "w-64"}
+          overflow-hidden
         `}
       >
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <Link
             href={"/"}
-            className="text-2xl font-bold text-gray-900 cursor-pointer"
+            className={`text-2xl font-bold text-gray-900 cursor-pointer transition-opacity duration-300 ${isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+              }`}
           >
             lms.
           </Link>
+
+          {/* Desktop Collapse Toggle */}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:block p-1 hover:bg-gray-100 rounded transition-colors"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </button>
+
+          {/* Mobile Close Button */}
           <button
             onClick={() => setIsOpen(false)}
             className="lg:hidden p-1 hover:bg-gray-100 rounded"
@@ -76,7 +101,7 @@ export default function AppSidebar() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
           <nav className="space-y-1">
             {navigationItems.map((item) => (
               <a
@@ -84,29 +109,34 @@ export default function AppSidebar() {
                 href={item.url}
                 onClick={() => setIsOpen(false)}
                 className={`
-                  flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
+                  flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
                   ${item.isActive
                     ? "bg-blue-50 text-blue-600 border border-blue-200"
                     : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   }
+                  ${isCollapsed ? "justify-center" : ""}
+                  group relative
                 `}
+                title={isCollapsed ? item.title : ""}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span className="font-medium truncate">{item.title}</span>
+                <span
+                  className={`font-medium truncate transition-all duration-300 ${isCollapsed
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100"
+                    }`}
+                >
+                  {item.title}
+                </span>
+
+                {/* Tooltip for collapsed state */}
+                {isCollapsed && (
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                    {item.title}
+                  </div>
+                )}
               </a>
             ))}
-
-
-            {["ADMIN", "SUPERADMIN", "TEACHER"].includes(role) && (
-              <Link
-                href="/Create/Class"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <PenTool className="h-5 w-5 flex-shrink-0" />
-                <span className="font-medium truncate">Create</span>
-              </Link>
-            )}
           </nav>
         </div>
       </div>
