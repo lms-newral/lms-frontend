@@ -13,9 +13,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const navigationItems = [
-  { title: "Dashboard", icon: Home, url: "/Dashboard", isActive: true },
+  { title: "Dashboard", icon: Home, url: "/Dashboard" },
   { title: "Courses", icon: MessageSquare, url: "/Courses" },
   { title: "Classes", icon: Book, url: "/Classes" },
   { title: "Assignments", icon: FileText, url: "/Assignments" },
@@ -26,6 +27,7 @@ const navigationItems = [
 export default function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathname = usePathname();
 
   return (
     <>
@@ -42,10 +44,11 @@ export default function AppSidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-transparent z-40"
           onClick={() => setIsOpen(false)}
         />
       )}
+
 
       {/* Overlay for desktop - when sidebar is expanded */}
       {!isCollapsed && (
@@ -103,40 +106,43 @@ export default function AppSidebar() {
         {/* Content */}
         <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
           <nav className="space-y-1">
-            {navigationItems.map((item) => (
-              <a
-                key={item.title}
-                href={item.url}
-                onClick={() => setIsOpen(false)}
-                className={`
+            {navigationItems.map((item) => {
+              const isAlive = pathname === item.url;
+              return (
+                <a
+                  key={item.title}
+                  href={item.url}
+                  onClick={() => setIsOpen(false)}
+                  className={`
                   flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
-                  ${item.isActive
-                    ? "bg-blue-50 text-blue-600 border border-blue-200"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  }
+                  ${pathname === item.url
+                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    }
                   ${isCollapsed ? "justify-center" : ""}
                   group relative
                 `}
-                title={isCollapsed ? item.title : ""}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span
-                  className={`font-medium truncate transition-all duration-300 ${isCollapsed
+                  title={isCollapsed ? item.title : ""}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  <span
+                    className={`font-medium truncate transition-all duration-300 ${isCollapsed
                       ? "opacity-0 w-0 overflow-hidden"
                       : "opacity-100"
-                    }`}
-                >
-                  {item.title}
-                </span>
-
-                {/* Tooltip for collapsed state */}
-                {isCollapsed && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      }`}
+                  >
                     {item.title}
-                  </div>
-                )}
-              </a>
-            ))}
+                  </span>
+
+                  {/* Tooltip for collapsed state */}
+                  {isCollapsed && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      {item.title}
+                    </div>
+                  )}
+                </a>
+              );
+            })}
           </nav>
         </div>
       </div>
