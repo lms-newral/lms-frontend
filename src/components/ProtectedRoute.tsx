@@ -15,6 +15,7 @@ export default function ProtectedRoute({
   children,
   allowedRoles = ["ADMIN", "SUPER_ADMIN", "TEACHER"],
   redirectTo = "/",
+
   requireAuth = true,
 }: ProtectedRouteProps) {
   const router = useRouter();

@@ -47,7 +47,7 @@ export default function ClassPageComponent(props: PropsData) {
   const user = useSelector((state: { user: UserState }) => state.user.user);
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-3xl lg:max-w-4xl  xl:max-w-7xl mx-auto">
       {/* Meeting/Video Link Section */}
       {(props.meetLink || props.videoLink) && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">

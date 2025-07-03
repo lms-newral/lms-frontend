@@ -99,26 +99,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   // Admin-only routes
   if (path.startsWith("/Create")) {
     return (
-      <ProtectedRoute allowedRoles={["admin"]} redirectTo="/Dashboard">
-        <div className="min-h-screen flex w-full">
-          <main className="flex-1 lg:ml-0">
-            <DashboardHeader />
-            {children}
-          </main>
-        </div>
-      </ProtectedRoute>
-    );
-  }
-
-  // Teacher-only routes
-  if (path.startsWith("/teacher")) {
-    return (
       <ProtectedRoute
-        allowedRoles={["teacher", "admin"]}
+        allowedRoles={["ADMIN", "SUPER_ADMIN"]}
         redirectTo="/Dashboard"
       >
         <div className="min-h-screen flex w-full">
-          <AppSidebar />
           <main className="flex-1 lg:ml-0">
             <DashboardHeader />
             {children}
