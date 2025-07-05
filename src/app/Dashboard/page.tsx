@@ -5,6 +5,7 @@ import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const [classes, setClasses] = useState<Classes[]>([]);
@@ -15,23 +16,28 @@ export default function Dashboard() {
   useEffect(() => {
     //to get the courses data
     async function getEnrolledCourses() {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${user.user?.id}`
-      );
-      console.log(response.data[0].course);
-      setCourses(response.data);
-    }
-    //to get the classes in enrolled courses data
-    async function getClassesInCourses() {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}class/all/${user.selectedCourse?.courseId}`,
-        {
-          headers: { Authorization: `Bearer ${user.accessToken}` },
-        }
-      );
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}course-enrollment/courses/${user.user?.id}`
+        );
+        //to get the classes in enrolled courses data
+        setCourses(response.data);
 
-      setClasses(response.data);
+        const resp = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}class/all/${user.selectedCourse?.courseId}`,
+          {
+            headers: { Authorization: `Bearer ${user.accessToken}` },
+          }
+        );
+
+        setClasses(resp.data);
+      } catch (error: any) {
+        toast.error(
+          error.response.data.message || "No enrolled courses found "
+        );
+      }
     }
+
     //to get the currrently selected course data
     async function getCourseById() {
       const response = await axios.get(
@@ -41,7 +47,6 @@ export default function Dashboard() {
     }
     getEnrolledCourses();
     getCourseById();
-    getClassesInCourses();
   }, []);
 
   return (

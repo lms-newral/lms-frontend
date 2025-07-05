@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { FaFirefoxBrowser } from "react-icons/fa";
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/Dashboard" },
@@ -22,6 +23,7 @@ const navigationItems = [
   { title: "Assignments", icon: FileText, url: "/Assignments" },
   { title: "Attachments", icon: PenTool, url: "/Attachments" },
   { title: "Notes", icon: Notebook, url: "/Notes" },
+  { title: "Browse Courses", icon: FaFirefoxBrowser, url: "/Request-enroll" },
 ];
 
 export default function AppSidebar() {

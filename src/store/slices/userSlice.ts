@@ -24,6 +24,7 @@ const userSlice = createSlice({
       state.user = null;
       state.accessToken = null;
       state.isAuthenticated = false;
+      state.selectedCourse = null;
     },
     selectCourse: (
       state,
