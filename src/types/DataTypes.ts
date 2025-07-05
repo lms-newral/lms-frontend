@@ -37,10 +37,10 @@ export interface Course {
   price?: number;
   category?: string;
   creator?: User;
-  creatorId?: string;
+  creatorId: string;
   enrollments?: CourseEnrollment[];
   classes?: Classes[];
-  class_count?: number;
+  _count?: { classes: number };
   createdAt?: string;
   updatedAt?: string;
   Note?: Note[];

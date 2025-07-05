@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser, setCourse } from "@/store/slices/userSlice";
@@ -9,12 +9,13 @@ import Header from "@/components/Header/Header";
 import AppSidebar from "@/components/Sidebar/AppSidebar";
 import DashboardHeader from "@/components/Dashboard/DashboardHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { toast } from "sonner";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const path = usePathname();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-
+  const router = useRouter();
   useEffect(() => {
     const refreshToken = async () => {
       const token = localStorage.getItem("refreshToken");
@@ -56,7 +57,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 courseIdToSet = courseResponse.data[0].course.id;
                 localStorage.setItem("courseId", courseIdToSet || "");
               }
-            } catch (courseError) {
+            } catch (courseError: any) {
+              router.push("/Request-enroll");
+              toast.error(courseError.response.data.message);
               console.error("Error fetching courses:", courseError);
             }
           }
@@ -68,8 +71,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         localStorage.setItem("refreshToken", response.data.refreshToken);
       } catch (error) {
         console.error("Refresh token error:", error);
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("courseId");
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +88,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   // Public routes (no authentication required)
-  if (path === "/" || path === "/Signin" || path === "/Signup") {
+  if (
+    path === "/" ||
+    path === "/Signin" ||
+    path === "/Signup" ||
+    path === "/Request-enroll"
+  ) {
     return (
       <>
         <Header />
@@ -101,7 +107,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   if (path.startsWith("/Create")) {
     return (
       <ProtectedRoute
-        allowedRoles={["ADMIN", "SUPER_ADMIN"]}
+        allowedRoles={["ADMIN", "SUPER_ADMIN", "TEACHER"]}
         redirectTo="/Dashboard"
       >
         <div className="min-h-screen flex w-full">

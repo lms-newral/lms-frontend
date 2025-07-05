@@ -49,9 +49,7 @@ export default function DashboardContent(props: props) {
                   alt={selectedCourse.title}
                 />
               ) : (
-                <span className="text-sm text-gray-500">
-                  Please enroll in a course
-                </span>
+                <span className="text-sm text-gray-500">no thumbnail</span>
               )}
             </div>
           </div>
@@ -130,9 +128,7 @@ export default function DashboardContent(props: props) {
         {/* Course Performance */}
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">
-              Course Performance
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900">Courses</h3>
           </div>
           <div className="p-6 space-y-4">
             {courses.map((course, index) => (
@@ -144,7 +140,7 @@ export default function DashboardContent(props: props) {
                   {course?.course?.title || "Error"}
                 </p>
                 <p className="text-xs text-gray-500 whitespace-nowrap">
-                  {course?.course?.class_count ?? 0} classes
+                  {course?.course?._count?.classes ?? 0} classes
                 </p>
               </div>
             ))}

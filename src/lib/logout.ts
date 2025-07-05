@@ -9,6 +9,7 @@ export const logoutUser = async (deviceId: string) => {
       deviceId: deviceId,
     });
     localStorage.removeItem("refreshToken"); // Only on success
+    localStorage.removeItem("courseId"); // Only on success
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Logout failed:", {

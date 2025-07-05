@@ -15,8 +15,22 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+<<<<<<< HEAD
 import { useSelector } from "react-redux";
 import { UserState } from "@/types/userstate";
+=======
+import { FaFirefoxBrowser } from "react-icons/fa";
+
+const navigationItems = [
+  { title: "Dashboard", icon: Home, url: "/Dashboard" },
+  { title: "Courses", icon: MessageSquare, url: "/Courses" },
+  { title: "Classes", icon: Book, url: "/Classes" },
+  { title: "Assignments", icon: FileText, url: "/Assignments" },
+  { title: "Attachments", icon: PenTool, url: "/Attachments" },
+  { title: "Notes", icon: Notebook, url: "/Notes" },
+  { title: "Browse Courses", icon: FaFirefoxBrowser, url: "/Request-enroll" },
+];
+>>>>>>> a79eb1ea5dbc75150a210e3e30748aeb90ac25af
 
 export default function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);

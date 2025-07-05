@@ -1,6 +1,6 @@
 "use client";
 import CourseCard from "@/components/Courses/CourseCard";
-import { setCourseWithPersistence } from "@/store/slices/userSlice";
+import { setCourse } from "@/store/slices/userSlice";
 import { Course } from "@/types/DataTypes";
 
 import { UserState } from "@/types/userstate";
@@ -22,7 +22,7 @@ export default function CoursesPage() {
   const user = useSelector((state: { user: UserState }) => state.user.user);
 
   function handleCourseSelectionSimple(courseId: string) {
-    dispatch(setCourseWithPersistence(courseId));
+    dispatch(setCourse(courseId));
     localStorage.setItem("courseId", courseId);
   }
 
@@ -79,12 +79,14 @@ export default function CoursesPage() {
                 <Link
                   key={index}
                   href={`/Classes`}
+                  title={courseData.course.creator?.name || ""}
                   className="w-full"
                   onClick={() =>
                     handleCourseSelectionSimple(courseData.course.id)
                   }
                 >
                   <CourseCard
+                    creatorId={courseData.course.creatorId || ""}
                     title={courseData.course.title}
                     description={courseData.course.description || ""}
                     thumbnailurl={courseData.course.thumbnail || ""}

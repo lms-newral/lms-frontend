@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({
   children,
-  allowedRoles = ["ADMIN", "SUPER_ADMIN", "TEACHER"],
+  allowedRoles = ["ADMIN", "SUPER_ADMIN", "TEACHER", "STUDENT"],
   redirectTo = "/",
 
   requireAuth = true,
