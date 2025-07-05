@@ -2,8 +2,11 @@
 import { Assignment } from "@/types/DataTypes";
 import { UserState } from "@/types/userstate";
 import axios from "axios";
+import { Edit, Trash } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 interface Data {
   assignments: Assignment[];
@@ -15,6 +18,7 @@ export default function AssignmentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const user = useSelector((state: { user: UserState }) => state.user);
   const course = useSelector(
     (state: { user: UserState }) => state.user.selectedCourse
   );
@@ -120,26 +124,63 @@ export default function AssignmentPage() {
             {value.assignments && value.assignments.length > 0 ? (
               <div className="w-full max-w-4xl">
                 {value.assignments.map(
-                  (assignment: Assignment, index2: number) => {
-                    return (
-                      <div key={assignment.id || index2} className="mb-6">
-                        <div className="mb-4 p-4 shadow border bg-white rounded-lg">
-                          <div className="mb-2 text-sm text-gray-500">
-                            Assignment #{index2 + 1}
-                          </div>
-                          <div className="text-gray-800 whitespace-pre-wrap">
-                            {assignment.assignments}
-                          </div>
-                          <div className="mt-3 text-sm text-gray-500">
-                            Created:{" "}
-                            {new Date(
-                              assignment.createdAt
-                            ).toLocaleDateString()}
-                          </div>
+                  (assignment: Assignment, index2: number) => (
+                    <div key={assignment.id || index2} className="mb-6">
+                      <div className="mb-4 p-4 shadow border bg-white rounded-lg">
+                        <div className="mb-2 text-sm text-gray-500">
+                          Assignment #{index2 + 1}
+                        </div>
+                        <div className="text-gray-800 whitespace-pre-wrap">
+                          {assignment.assignments}
+                        </div>
+                        <div className="mt-3 text-sm text-gray-500">
+                          Created:{" "}
+                          {new Date(assignment.createdAt).toLocaleDateString()}
                         </div>
                       </div>
-                    );
-                  }
+                      {user.user &&
+                        (user.user.role === "ADMIN" ||
+                          user.user.role === "SUPER_ADMIN" ||
+                          user.user.role === "TEACHER") && (
+                          <div className="flex gap-2 ml-4">
+                            <Link
+                              href={`/Update/${assignment.id}/Assignment`}
+                              className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                              aria-label="Edit assignment"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                            <button
+                              onClick={() => {
+                                axios
+                                  .delete(
+                                    `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/delete/${assignment.id}`,
+                                    {
+                                      headers: {
+                                        Authorization: `Bearer ${user.accessToken}`,
+                                      },
+                                    }
+                                  )
+                                  .then(() => {
+                                    toast.success("Assignment deleted");
+                                  })
+                                  .catch((error: any) => {
+                                    console.log(error);
+                                    toast.error(
+                                      error.response?.data?.message ||
+                                        "Failed to delete assignment"
+                                    );
+                                  });
+                              }}
+                              className="p-1 text-red-600 cursor-pointer hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                              aria-label="Delete assignment"
+                            >
+                              <Trash className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                    </div>
+                  )
                 )}
               </div>
             ) : (

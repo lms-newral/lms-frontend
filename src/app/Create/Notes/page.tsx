@@ -8,8 +8,6 @@ import { toast } from "sonner";
 import {
   BookOpen,
   Video,
-  VideoOff,
-  Link2,
   NotebookPen,
   StickyNote,
   ClipboardList,
@@ -36,22 +34,21 @@ import TextAlign from "@tiptap/extension-text-align";
 import { Underline } from "@tiptap/extension-underline";
 
 import { UserState } from "@/types/userstate";
-import { Course } from "@/types/DataTypes";
+import { Classes, Course } from "@/types/DataTypes";
 
 /* -------------------------------------------------- */
 
-export default function Classes() {
+export default function CreateNotes() {
   const router = useRouter();
   const user = useSelector((state: { user: UserState }) => state.user);
 
   /* ──────────────── local state ──────────────── */
-  const [title, setTitle] = useState("");
-  const [liveLink, setLiveLink] = useState("");
-  const [recordedLink, setRecordedLink] = useState("");
-  const [courseId, setCourseId] = useState("");
 
+  const [courseId, setCourseId] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
 
+  const [classes, setClasses] = useState<Classes[]>([]);
+  const [classId, setClassId] = useState("");
   const [assignments, setAssignments] = useState<string[]>([]);
   const [assignmentInput, setAssignmentInput] = useState("");
 
@@ -62,6 +59,23 @@ export default function Classes() {
   const [notes, setNotes] = useState<string[]>([]); // all notes added
 
   /* ──────────────── fetch courses ──────────────── */
+
+  async function getClasses() {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}class/all/${courseId}`,
+        {
+          headers: { Authorization: `Bearer ${user.accessToken}` },
+        }
+      );
+      setClasses(res.data);
+      console.log("Classes fetched:", res.data);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      toast.error("Could not fetch classes");
+    }
+  }
+
   useEffect(() => {
     if (!user.accessToken) {
       toast.error("User is not authenticated");
@@ -80,11 +94,32 @@ export default function Classes() {
         } catch {
           toast.error("Could not fetch courses");
         }
+      } else {
+        try {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}course/createdBy`,
+            {
+              headers: { Authorization: `Bearer ${user.accessToken}` },
+            }
+          );
+          setCourses(res.data);
+        } catch (error: any) {
+          toast.error(error.response.data.message);
+          toast.error("Could not fetch courses");
+        }
       }
     }
 
     getCourses();
   }, [user, router]);
+
+  // Fetch classes when courseId changes
+  useEffect(() => {
+    if (courseId) {
+      getClasses();
+      setClassId(""); // Reset class selection when course changes
+    }
+  }, [courseId]);
 
   /* ──────────────── TipTap editor setup ──────────────── */
 
@@ -96,6 +131,7 @@ export default function Classes() {
     ],
     content: noteHtml,
     onUpdate: ({ editor }) => {
+      const text = editor.getText();
       setNoteHtml(editor.getHTML());
     },
   });
@@ -105,37 +141,24 @@ export default function Classes() {
     e.preventDefault();
 
     /* basic validations */
-    if (!title || !courseId)
-      return toast.error("Please fill in title and course.");
-    if ((liveLink && recordedLink) || (!liveLink && !recordedLink))
-      return toast.error("Fill either Live or Recorded Link (not both).");
-
-    const classPayload = {
-      title,
-      videoLink: recordedLink || "",
-      zoomLink: liveLink || "",
-      isLive: !!liveLink,
-      isRecorded: !!recordedLink,
-      notes: noteHtml, // (optional: your backend may ignore)
-      assignments,
-      attachments,
-    };
+    if (!classId) return toast.error("Please select a class.");
 
     try {
-      /* 1️⃣  Create class */
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}class/create/${courseId}`,
-        classPayload,
-        { headers: { Authorization: `Bearer ${user.accessToken}` } }
-      );
+      /* 1️⃣  Create all saved notes */
+      if (notes.length > 0) {
+        await Promise.all(
+          notes.map((noteHtml) =>
+            axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${classId}`,
+              { notesHtml: noteHtml },
+              { headers: { Authorization: `Bearer ${user.accessToken}` } }
+            )
+          )
+        );
+      }
 
-      /* Grab the classId returned by the backend */
-      const classId =
-        res.data?.data?.id ?? res.data?.data?.classId ?? res.data?.classId;
-      if (!classId) throw new Error("classId not returned from backend");
-
-      /* 2️⃣  Create note (HTML) */
-      if (noteHtml) {
+      /* 2️⃣  Create current note in editor (if any) */
+      if (noteHtml && editor?.getText().trim()) {
         await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/create/${classId}`,
           { notesHtml: noteHtml },
@@ -144,42 +167,50 @@ export default function Classes() {
       }
 
       /* 3️⃣  Create attachments */
-      await Promise.all(
-        attachments.map((link) =>
-          axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${classId}`,
-            { attachment: link },
-            { headers: { Authorization: `Bearer ${user.accessToken}` } }
+      if (attachments.length > 0) {
+        await Promise.all(
+          attachments.map((link) =>
+            axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/create/${classId}`,
+              { attachment: link },
+              { headers: { Authorization: `Bearer ${user.accessToken}` } }
+            )
           )
-        )
-      );
+        );
+      }
 
       /* 4️⃣  Create assignments */
-      await Promise.all(
-        assignments.map((link) =>
-          axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${classId}`,
-            { assignment: link },
-            { headers: { Authorization: `Bearer ${user.accessToken}` } }
+      if (assignments.length > 0) {
+        await Promise.all(
+          assignments.map((link) =>
+            axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/create/${classId}`,
+              { assignment: link },
+              { headers: { Authorization: `Bearer ${user.accessToken}` } }
+            )
           )
-        )
+        );
+      }
+
+      toast.success(
+        "Notes, attachments, and assignments created successfully!"
       );
 
-      toast.success("Class, notes, attachments, and assignments created!");
-
       /* reset form */
-      setTitle("");
-      setLiveLink("");
-      setRecordedLink("");
+
       setCourseId("");
+      setClassId("");
       setAssignmentInput("");
       setAssignments([]);
       setAttachmentInput("");
       setAttachments([]);
+      setNotes([]);
+      setNoteHtml("");
       editor?.commands.setContent("");
     } catch (err: any) {
+      console.error("Error creating notes:", err);
       toast.error(
-        err.response?.data?.message || err.message || "Failed to create class."
+        err.response?.data?.message || err.message || "Failed to create notes."
       );
     }
   };
@@ -191,60 +222,14 @@ export default function Classes() {
     <div className="mx-auto mt-10 w-full max-w-2xl rounded-xl bg-white p-6 ">
       <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
         <NotebookPen className="h-5 w-5 text-blue-600" />
-        Create a Class
+        Add to Class
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* title */}
-        <div>
-          <label className="flex items-center gap-1 text-sm font-medium">
-            <BookOpen className="h-4 w-4 text-blue-600" />
-            Title <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="text"
-            className="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* links */}
-        <div>
-          <label className="flex items-center gap-1 text-sm font-medium">
-            <Link2 className="h-4 w-4 text-blue-600" />
-            Live Class Link
-          </label>
-          <input
-            type="url"
-            className="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
-            value={liveLink}
-            onChange={(e) => setLiveLink(e.target.value)}
-            disabled={!!recordedLink}
-            placeholder="https://zoom.us/..."
-          />
-        </div>
-
-        <div>
-          <label className="flex items-center gap-1 text-sm font-medium">
-            <Video className="h-4 w-4 text-blue-600" />
-            Recorded Video Link
-          </label>
-          <input
-            type="url"
-            className="mt-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
-            value={recordedLink}
-            onChange={(e) => setRecordedLink(e.target.value)}
-            disabled={!!liveLink}
-            placeholder="https://youtube.com/..."
-          />
-        </div>
-
         {/* course select */}
         <div>
           <label className="flex items-center gap-1 text-sm font-medium">
-            <VideoOff className="h-4 w-4 text-blue-600" />
+            <BookOpen className="h-4 w-4 text-blue-600" />
             Select Course <span className="text-red-600">*</span>
           </label>
           <Select value={courseId} onValueChange={setCourseId}>
@@ -253,6 +238,26 @@ export default function Classes() {
             </SelectTrigger>
             <SelectContent className="max-h-60 overflow-y-auto">
               {courses.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* class select */}
+        <div>
+          <label className="flex items-center gap-1 text-sm font-medium">
+            <Video className="h-4 w-4 text-blue-600" />
+            Select Class <span className="text-red-600">*</span>
+          </label>
+          <Select value={classId} onValueChange={setClassId}>
+            <SelectTrigger className="mt-2 w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+              <SelectValue placeholder="-- Select a class --" />
+            </SelectTrigger>
+            <SelectContent className="max-h-60 overflow-y-auto">
+              {classes.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.title}
                 </SelectItem>
@@ -443,7 +448,7 @@ export default function Classes() {
             type="submit"
             className="rounded-lg w-full bg-blue-600 px-5 py-2 text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            Create Class
+            Add
           </button>
         </div>
       </form>

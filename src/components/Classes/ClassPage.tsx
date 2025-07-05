@@ -4,6 +4,8 @@ import NotesCard from "./NotesCard";
 import { UserState } from "@/types/userstate";
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface PropsData {
   videoLink?: string;
@@ -44,7 +46,7 @@ interface PropsData {
  * - Shows edit and delete icons for assignments if the user has an admin, super admin, or teacher role.
  */
 export default function ClassPageComponent(props: PropsData) {
-  const user = useSelector((state: { user: UserState }) => state.user.user);
+  const user = useSelector((state: { user: UserState }) => state.user);
 
   return (
     <div className="p-4 max-w-3xl lg:max-w-4xl  xl:max-w-7xl mx-auto">
@@ -158,18 +160,40 @@ export default function ClassPageComponent(props: PropsData) {
                       </div>
                     </div>
                   </div>
-                  {user &&
-                    (user.role === "ADMIN" ||
-                      user.role === "SUPER_ADMIN" ||
-                      user.role === "TEACHER") && (
+                  {user.user &&
+                    (user.user.role === "ADMIN" ||
+                      user.user.role === "SUPER_ADMIN" ||
+                      user.user.role === "TEACHER") && (
                       <div className="flex gap-2 ml-4">
-                        <button
+                        <Link
+                          href={`/Update/${assignment.id}/Assignment`}
                           className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                           aria-label="Edit assignment"
                         >
                           <Edit className="w-4 h-4" />
-                        </button>
+                        </Link>
                         <button
+                          onClick={() => {
+                            axios
+                              .delete(
+                                `${process.env.NEXT_PUBLIC_BACKEND_URL}assignment/delete/${assignment.id}`,
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${user.accessToken}`,
+                                  },
+                                }
+                              )
+                              .then(() => {
+                                toast.success("Assignment deleted");
+                              })
+                              .catch((error: any) => {
+                                console.log(error);
+                                toast.error(
+                                  error.response?.data?.message ||
+                                    "Failed to delete assignment"
+                                );
+                              });
+                          }}
                           className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                           aria-label="Delete assignment"
                         >
@@ -207,6 +231,47 @@ export default function ClassPageComponent(props: PropsData) {
                       {new Date(attachment.createdAt).toLocaleDateString()}
                     </p>
                   </div>
+                  {user.user &&
+                    (user.user.role === "ADMIN" ||
+                      user.user.role === "SUPER_ADMIN" ||
+                      user.user.role === "TEACHER") && (
+                      <div className="flex gap-2 ml-4">
+                        <Link
+                          href={`/Update/${attachment.id}/Attachment`}
+                          className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                          aria-label="Edit assignment"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button
+                          onClick={() => {
+                            axios
+                              .delete(
+                                `${process.env.NEXT_PUBLIC_BACKEND_URL}attachment/delete/${attachment.id}`,
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${user.accessToken}`,
+                                  },
+                                }
+                              )
+                              .then(() => {
+                                toast.success("Attachment deleted");
+                              })
+                              .catch((error: any) => {
+                                console.log(error);
+                                toast.error(
+                                  error.response?.data?.message ||
+                                    "Failed to delete attachment"
+                                );
+                              });
+                          }}
+                          className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                          aria-label="Delete assignment"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
