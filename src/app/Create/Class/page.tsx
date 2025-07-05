@@ -44,6 +44,7 @@ export default function Classes() {
   const router = useRouter();
   const user = useSelector((state: { user: UserState }) => state.user);
 
+
   /* ──────────────── local state ──────────────── */
   const [title, setTitle] = useState("");
   const [liveLink, setLiveLink] = useState("");
@@ -58,7 +59,10 @@ export default function Classes() {
   const [attachments, setAttachments] = useState<string[]>([]);
   const [attachmentInput, setAttachmentInput] = useState("");
 
-  const [noteHtml, setNoteHtml] = useState("");
+  const [noteHtml, setNoteHtml] = useState(""); // current note being typed
+  const [notes, setNotes] = useState<string[]>([]); // all notes added
+
+
 
   /* ──────────────── fetch courses ──────────────── */
   useEffect(() => {
@@ -75,6 +79,7 @@ export default function Classes() {
             `${process.env.NEXT_PUBLIC_BACKEND_URL}course`
           );
           setCourses(res.data);
+          console.log(res.data);
         } catch {
           toast.error("Could not fetch courses");
         }
@@ -270,58 +275,98 @@ export default function Classes() {
         <div>
           <label className="mb-2 flex items-center gap-1 text-sm font-medium">
             <StickyNote className="h-4 w-4 text-blue-600" />
-            Notes (max 100 words)
+            Notes
           </label>
 
           {/* toolbar */}
-          <div className="mb-2 flex flex-wrap items-center gap-2 text-gray-700">
-            {[
-              {
-                Icon: Bold,
-                action: () => editor?.chain().focus().toggleBold().run(),
-              },
-              {
-                Icon: Italic,
-                action: () => editor?.chain().focus().toggleItalic().run(),
-              },
-              {
-                Icon: UnderlineIcon,
-                action: () => editor?.chain().focus().toggleUnderline().run(),
-              },
-              {
-                Icon: AlignLeft,
-                action: () =>
-                  editor?.chain().focus().setTextAlign("left").run(),
-              },
-              {
-                Icon: AlignCenter,
-                action: () =>
-                  editor?.chain().focus().setTextAlign("center").run(),
-              },
-              {
-                Icon: AlignRight,
-                action: () =>
-                  editor?.chain().focus().setTextAlign("right").run(),
-              },
-            ].map(({ Icon, action }, idx) => (
-              <button
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-gray-700">
+            {/* Left: Formatting Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                {
+                  Icon: Bold,
+                  action: () => editor?.chain().focus().toggleBold().run(),
+                },
+                {
+                  Icon: Italic,
+                  action: () => editor?.chain().focus().toggleItalic().run(),
+                },
+                {
+                  Icon: UnderlineIcon,
+                  action: () => editor?.chain().focus().toggleUnderline().run(),
+                },
+                {
+                  Icon: AlignLeft,
+                  action: () => editor?.chain().focus().setTextAlign("left").run(),
+                },
+                {
+                  Icon: AlignCenter,
+                  action: () => editor?.chain().focus().setTextAlign("center").run(),
+                },
+                {
+                  Icon: AlignRight,
+                  action: () => editor?.chain().focus().setTextAlign("right").run(),
+                },
+              ].map(({ Icon, action }, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={action}
+                  className="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              ))}
+            </div>
+
+            {/* Right: Add Button */}
+            <button
+              type="button"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              onClick={() => {
+                if (noteHtml.trim() && editor?.getText().trim()) {
+                  setNotes((prev) => [...prev, noteHtml]);
+                  setNoteHtml("");
+                  editor?.commands.clearContent();
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+          <div
+            className="min-h-[200px] rounded-lg border border-gray-300 bg-gray-50 p-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500"
+            onClick={() => {
+              if (editor && !editor.isFocused) {
+                editor.commands.focus();
+              }
+            }}
+          >
+            <EditorContent editor={editor} className="min-h-[150px] cursor-text" />
+          </div>
+        </div>
+        {notes.length > 0 && (
+          <div className="mt-4 space-y-3">
+            <p className="text-sm font-medium text-blue-600">Saved Notes:</p>
+            {notes.map((note, idx) => (
+              <div
                 key={idx}
-                type="button"
-                onClick={action}
-                className="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="relative rounded-md border border-gray-200 bg-white p-3 shadow-sm text-sm"
               >
-                <Icon className="h-4 w-4" />
-              </button>
+                <button
+                  onClick={() =>
+                    setNotes((prevNotes) => prevNotes.filter((_, i) => i !== idx))
+                  }
+                  className="absolute right-2 top-2 text-blue-600 hover:text-red-600"
+                >
+                  ✕
+                </button>
+                <div dangerouslySetInnerHTML={{ __html: note }} />
+              </div>
             ))}
           </div>
+        )}
 
-          <div className="min-h-[200px] rounded-lg border border-gray-300 bg-gray-50 p-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500">
-            <EditorContent editor={editor} className="min-h-[150px]" />
-          </div>
-          <p className="mt-1 text-right text-xs text-gray-500">
-            {countWords(editor?.getText() ?? "")}/100 words
-          </p>
-        </div>
 
         {/* assignments */}
         <div>
