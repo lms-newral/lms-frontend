@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { User, HelpCircle, Bug, LogOut, BookCheckIcon } from "lucide-react";
+import { User, MessageSquare, LogOut, PlusCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,29 +69,51 @@ export default function ProfileDropdown({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer group">
-          <BookCheckIcon className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+          <MessageSquare className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
           <Link href="/Courses" className="w-full">
             Courses
           </Link>
         </DropdownMenuItem>
+        {(user?.role === "ADMIN" ||
+          user?.role === "SUPER_ADMIN" ||
+          user?.role === "TEACHER") && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer group">
+              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Link href="/Create/Class" className="w-full">
+                Create Class
+              </Link>
+            </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer group">
+              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Link href="/Create/Course" className="w-full">
+                Create Course
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer group">
+              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Link href="/Create/Notes" className="w-full">
+                Add Notes to Class
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer group">
+              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Link href="/Create/Notes" className="w-full">
+                Add Assigment to Class
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer group">
+              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Link href="/Create/Notes" className="w-full">
+                Add Attachment to Class
+              </Link>
+            </DropdownMenuItem>
 
-        <DropdownMenuItem className="cursor-pointer group">
-          <HelpCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-          <Link href="/support/feature-request" className="w-full">
-            Feature Request
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="cursor-pointer group">
-          <Bug className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-          <Link href="/support/bug-report" className="w-full">
-            Bug Report
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
+          </>
+        )}
 
         <DropdownMenuItem
           onClick={handleLogout}
