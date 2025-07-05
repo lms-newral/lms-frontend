@@ -3,14 +3,18 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useRef, useEffect } from "react";
+import { UserState } from "@/types/userstate";
+import { useSelector } from "react-redux";
 
 const Hero = () => {
   const router = useRouter();
 
+  const user = useSelector((state: { user: UserState }) => state.user);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const paraRef = useRef<HTMLParagraphElement | null>(null);
   const btnsRef = useRef<HTMLDivElement | null>(null);
   const trustRef = useRef<HTMLParagraphElement | null>(null);
+
 
   useEffect(() => {
     const tl = gsap.timeline();
@@ -85,17 +89,15 @@ const Hero = () => {
           ref={titleRef}
           className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6"
         >
-          Learn Without
-          <span className="block text-blue-600">Limits</span>
+          Empower Your Learning
+          <span className="block text-blue-600">Anytime, Anywhere</span>
         </h1>
 
         <p
           ref={paraRef}
           className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto"
         >
-          Transform your educational journey with our cutting-edge Learning
-          Management System. Create, manage, and deliver exceptional learning
-          experiences.
+          Join a powerful LMS platform that helps students and educators connect, collaborate, and succeed. Access courses, assignments, and progress tracking — all in one place.
         </p>
 
         <div
@@ -104,17 +106,16 @@ const Hero = () => {
         >
           <Button
             size="lg"
-            onClick={() => router.push("/signin")}
+            onClick={() => {
+              if (user?.accessToken) {
+                router.push("/Dashboard");
+              } else {
+                router.push("/Signin");
+              }
+            }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
           >
             Start Learning Today
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-blue-600 text-blue-600 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
-          >
-            Watch Demo
           </Button>
         </div>
 
