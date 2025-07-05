@@ -148,7 +148,7 @@ export default function AttachmentPage() {
                             user.user.role === "TEACHER") && (
                             <div className="flex gap-2 ml-4">
                               <Link
-                                href={`/Update/${Attachment.id}/Assignment`}
+                                href={`/Update/${Attachment.id}/Attachment`}
                                 className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                                 aria-label="Edit assignment"
                               >
