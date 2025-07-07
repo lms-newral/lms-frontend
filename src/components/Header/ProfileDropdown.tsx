@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { User, MessageSquare, LogOut, PlusCircle } from "lucide-react";
+import {
+  User,
+  MessageSquare,
+  LogOut,
+  PlusCircle,
+  BellDotIcon,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,6 +86,12 @@ export default function ProfileDropdown({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer group">
+              <BellDotIcon className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <Link href="/Admin/Accept-enroll" className="w-full">
+                Enrollment Requests
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer group">
               <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
               <Link href="/Create/Class" className="w-full">
                 Create Class
@@ -101,7 +113,7 @@ export default function ProfileDropdown({
             <DropdownMenuItem className="cursor-pointer group">
               <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
               <Link href="/Create/Notes" className="w-full">
-                Add Assigment to Class
+                Add Assignment to Class
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer group">
