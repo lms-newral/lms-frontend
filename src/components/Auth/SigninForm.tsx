@@ -38,7 +38,9 @@ export default function SigninForm() {
       }
 
       const loginUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}auth/login`;
+      console.log(loginUrl);
       const res = await axios.post(loginUrl, { email, password });
+
       localStorage.setItem("refreshToken", res.data.refreshToken);
       dispatch(
         setUser({
