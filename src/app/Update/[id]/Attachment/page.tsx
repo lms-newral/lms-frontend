@@ -4,7 +4,7 @@ import axios from "axios";
 import { UserState } from "@/types/userstate";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
-import { Attachment, Course } from "@/types/DataTypes";
+import { Attachment, Classes, Course } from "@/types/DataTypes";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
