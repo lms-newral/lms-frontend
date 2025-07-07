@@ -168,6 +168,7 @@ export default function AttachmentPage() {
                                     .then(() => {
                                       toast.success("Assignment deleted");
                                     })
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     .catch((error: any) => {
                                       console.log(error);
                                       toast.error(

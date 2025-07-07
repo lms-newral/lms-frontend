@@ -28,7 +28,7 @@ export default function ClassPage() {
 
   const [loading, setLoading] = useState(true);
 
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const params = useParams();
 
   const user = useSelector((state: { user: UserState }) => state.user);
@@ -79,7 +79,7 @@ export default function ClassPage() {
     if (params.id) {
       getClassData();
     }
-  }, [params.id]);
+  }, [params.id, user.accessToken]);
 
   if (loading) {
     return (

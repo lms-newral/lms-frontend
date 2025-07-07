@@ -49,7 +49,7 @@ export default function Class() {
 
   useEffect(() => {
     getClasses();
-  }, [course?.courseId]);
+  }, [course?.courseId, getClasses]);
 
   if (loading) {
     return (

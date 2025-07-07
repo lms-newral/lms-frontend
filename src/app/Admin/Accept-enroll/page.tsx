@@ -44,7 +44,7 @@ export default function AcceptEnroll() {
       if (response.data?.data) {
         setEnrollmentRequests(response.data.data);
       } else {
-        setEnrollmentRequests(response.data as EnrollmentRequest[]);
+        setEnrollmentRequests(response.data as unknown as EnrollmentRequest[]);
       }
     } catch (err) {
       console.error("Failed to fetch enrollment requests:", err);

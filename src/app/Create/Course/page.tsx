@@ -45,7 +45,7 @@ export default function CreateCoursePage() {
       // Upload to Cloudinary
       const uploadData = new FormData();
       uploadData.append("file", file);
-      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET || "");
 
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
