@@ -40,19 +40,15 @@ export default function NotesPage() {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}notes/course/${courseId}`
         );
 
-        // Handle the case where resp.data might be empty or null
         setArrayData(resp.data || []);
-        console.log(resp.data);
       } catch (error) {
         console.error("Error fetching notes:", error);
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 404) {
-            // Handle 404 - no notes found
             setArrayData([]);
           } else {
             setError(
-              `Failed to load notes: ${
-                error.response?.data?.message || error.message
+              `Failed to load notes: ${error.response?.data?.message || error.message
               }`
             );
           }
@@ -65,20 +61,22 @@ export default function NotesPage() {
     }
 
     getData();
-  }, [courseId]); // Added courseId as dependency
+  }, [courseId]);
+
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading notes...</div>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-lg text-gray-700">Loading notes...</div>
       </div>
     );
   }
 
+
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-red-500 text-center max-w-md">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
           <p>{error}</p>
         </div>
@@ -86,10 +84,11 @@ export default function NotesPage() {
     );
   }
 
+
   if (!user.selectedCourse) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-gray-500 text-center max-w-md">
           <h2 className="text-xl font-semibold mb-2">No Course Selected</h2>
           <p>Please select a course to view notes.</p>
         </div>
@@ -97,10 +96,11 @@ export default function NotesPage() {
     );
   }
 
+
   if (arrayData.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-gray-500 text-center max-w-md">
           <h2 className="text-xl font-semibold mb-2">No Notes Found</h2>
           <p>There are no notes available for this course yet.</p>
         </div>
@@ -108,46 +108,43 @@ export default function NotesPage() {
     );
   }
 
+
   return (
-    <div className="min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-6 text-center">Course Notes</h1>
+    <div className="min-h-screen p-4 sm:p-6 md:p-10 max-w-7xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
+        Course Notes
+      </h1>
 
-      {/* Map over the whole course data first to get the notes according to class */}
-      {arrayData.map((value: Data, index: number) => {
-        return (
-          <div
-            key={index}
-            className="flex flex-col mt-2 items-center px-2 pt-4 border-y"
-          >
-            <h2 className="md:text-3xl text-xl font-semibold mb-4">
-              {value.title}
-            </h2>
+      {arrayData.map((value: Data, index: number) => (
+        <div
+          key={index}
+          className="flex flex-col items-center border-t border-gray-200 py-6"
+        >
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-4 text-center">
+            {value.title}
+          </h2>
 
-            {/* Now mapping over each note in a class */}
-            {value.notes && value.notes.length > 0 ? (
-              <div className="w-full max-w-4xl">
-                {value.notes.map((note: Notes, index2: number) => {
-                  return (
-                    <div key={note.id || index2} className="mb-6">
-                      <NotesCard
-                        notesId={note.id}
-                        htmlContent={note.notesHtml}
-                      />
-                      <div className="mb-2 text-sm text-gray-500 text-center mt-2">
-                        Created: {new Date(note.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-gray-500 text-center py-8">
-                <p>No notes available for this class.</p>
-              </div>
-            )}
-          </div>
-        );
-      })}
+          {value.notes && value.notes.length > 0 ? (
+            <div className="w-full max-w-4xl px-2">
+              {value.notes.map((note: Notes, index2: number) => (
+                <div key={note.id || index2} className="mb-6">
+                  <NotesCard
+                    notesId={note.id}
+                    htmlContent={note.notesHtml}
+                  />
+                  <div className="mt-2 text-sm text-gray-500 text-center">
+                    Created: {new Date(note.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-400 text-center py-4">
+              No notes available for this class.
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
