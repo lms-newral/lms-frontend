@@ -3,7 +3,7 @@ import ClassCard from "@/components/Classes/ClassCard";
 import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Classes } from "@/types/DataTypes";
 interface ClassData extends Classes {
   isClient: boolean;
@@ -21,7 +21,7 @@ export default function Class() {
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
 
-  async function getClasses() {
+  const getClasses = useCallback(async () => {
     console.log(course);
     if (!course?.courseId) return;
 
@@ -41,7 +41,7 @@ export default function Class() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [course, token]);
 
   useEffect(() => {
     setIsClient(true);
@@ -49,7 +49,7 @@ export default function Class() {
 
   useEffect(() => {
     getClasses();
-  }, [course?.courseId]);
+  }, [getClasses]);
 
   if (loading) {
     return (

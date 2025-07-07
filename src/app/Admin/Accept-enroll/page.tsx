@@ -44,7 +44,7 @@ export default function AcceptEnroll() {
       if (response.data?.data) {
         setEnrollmentRequests(response.data.data);
       } else {
-        setEnrollmentRequests(response.data as EnrollmentRequest[]);
+        setEnrollmentRequests(response.data as unknown as EnrollmentRequest[]);
       }
     } catch (err) {
       console.error("Failed to fetch enrollment requests:", err);
@@ -68,7 +68,7 @@ export default function AcceptEnroll() {
 
   if (error) {
     return (
-      <div className="pt-8">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           {error}
           <button
@@ -83,14 +83,14 @@ export default function AcceptEnroll() {
   }
 
   return (
-    <div className="pt-8">
+    <div className="min-h-screen flex items-center justify-center">
       {enrollmentRequests.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <p className="text-lg">No enrollment requests found</p>
           <p className="text-sm mt-2">Check back later for new requests</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="pt-10 min-h-screen w-full flex justify-centerr">
           {enrollmentRequests.map((request) => (
             <EnrollReqCard
               key={request.id}

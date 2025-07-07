@@ -14,7 +14,7 @@ export default function SingleCoursePage(props: props) {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}course/getCourseById/${props.courseId}`
       );
       console.log(response.data);
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response.data.message);
     }
   }

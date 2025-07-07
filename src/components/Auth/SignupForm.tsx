@@ -233,7 +233,7 @@ export default function SignupForm() {
     try {
       const uploadData = new FormData();
       uploadData.append("file", file);
-      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      uploadData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET || "");
 
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -275,10 +275,6 @@ export default function SignupForm() {
     formData.password === formData.confirmPassword &&
     formData.password.length > 0 &&
     formData.confirmPassword.length > 0;
-
-  const passwordsMatch =
-    formData.confirmPassword.length > 0 &&
-    formData.password === formData.confirmPassword;
 
   const passwordsDontMatch =
     formData.confirmPassword.length > 0 &&

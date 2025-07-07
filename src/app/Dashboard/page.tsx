@@ -55,7 +55,9 @@ export default function Dashboard() {
         user={{ name: user.user?.username ?? "" }}
         classes={classes}
         courses={courses}
-        selectedCourse={selectedCourse ?? { id: "", title: "", thumbnail: "" }}
+        selectedCourse={
+          selectedCourse ?? { id: "", title: "", thumbnail: "", creatorId: "" }
+        }
       />
     </div>
   );

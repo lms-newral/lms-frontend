@@ -76,7 +76,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       }
     };
     refreshToken();
-  }, [dispatch, path]);
+  }, [dispatch, path, router]);
 
   // Show loading spinner while authenticating
   if (isLoading) {
@@ -92,7 +92,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     path === "/" ||
     path === "/Signin" ||
     path === "/Signup" ||
-    path === "/Request-enroll"
+    path === "/Request-enroll" ||
+    path.startsWith("/Admin")
   ) {
     return (
       <>
@@ -104,7 +105,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   // Admin-only routes
-  if (path.startsWith("/Create")) {
+  if (path.startsWith("/Create") || path.startsWith("/Update")) {
     return (
       <ProtectedRoute
         allowedRoles={["ADMIN", "SUPER_ADMIN", "TEACHER"]}
