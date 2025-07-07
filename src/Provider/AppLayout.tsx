@@ -92,7 +92,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     path === "/" ||
     path === "/Signin" ||
     path === "/Signup" ||
-    path === "/Request-enroll"
+    path === "/Request-enroll" ||
+    path.startsWith("/Admin")
   ) {
     return (
       <>
