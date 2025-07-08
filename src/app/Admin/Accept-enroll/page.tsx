@@ -1,4 +1,5 @@
 "use client";
+
 import EnrollReqCard from "@/components/EnrollReqeuestCard";
 import axios from "axios";
 import { useEffect, useState, useCallback } from "react";
@@ -26,9 +27,7 @@ interface ApiResponse {
 }
 
 export default function AcceptEnroll() {
-  const [enrollmentRequests, setEnrollmentRequests] = useState<
-    EnrollmentRequest[]
-  >([]);
+  const [enrollmentRequests, setEnrollmentRequests] = useState<EnrollmentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,7 +67,7 @@ export default function AcceptEnroll() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           {error}
           <button
@@ -83,14 +82,14 @@ export default function AcceptEnroll() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen px-4 py-10">
       {enrollmentRequests.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <p className="text-lg">No enrollment requests found</p>
           <p className="text-sm mt-2">Check back later for new requests</p>
         </div>
       ) : (
-        <div className="pt-10 min-h-screen w-full flex justify-centerr">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {enrollmentRequests.map((request) => (
             <EnrollReqCard
               key={request.id}

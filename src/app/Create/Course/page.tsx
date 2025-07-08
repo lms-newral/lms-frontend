@@ -128,11 +128,12 @@ export default function CreateCoursePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg p-6 rounded-lg w-full max-w-4xl"
+        className="bg-white shadow-lg w-full max-w-xl sm:max-w-2xl lg:max-w-4xl p-4 sm:p-6 rounded-xl"
       >
+
         <h2 className="text-2xl font-semibold mb-4 text-center">
           Create a New Course
         </h2>
@@ -144,7 +145,7 @@ export default function CreateCoursePage() {
           </label>
           <input
             type="text"
-            className="w-full border p-2 rounded bg-gray-100"
+            className="w-full border p-2 rounded bg-gray-100 text-sm sm:text-base"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter course title"
@@ -194,7 +195,8 @@ export default function CreateCoursePage() {
           ) : (
             <div
               onClick={handleBrowseClick}
-              className="border-2 border-dashed border-blue-600 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition"
+              className="border-2 border-dashed border-blue-600 rounded-md p-4 sm:p-6 text-center cursor-pointer hover:bg-gray-50 transition"
+
             >
               <FaImage className="mx-auto text-3xl text-gray-300 mb-2" />
               <p className="text-gray-600 font-medium">
@@ -228,8 +230,8 @@ export default function CreateCoursePage() {
           {loading
             ? "Creating..."
             : uploadingImage
-            ? "Uploading Image..."
-            : "Create Course"}
+              ? "Uploading Image..."
+              : "Create Course"}
         </button>
       </form>
     </div>

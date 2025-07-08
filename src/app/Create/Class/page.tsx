@@ -189,7 +189,8 @@ export default function Classes() {
   /* -------------------  RENDER  ---------------------- */
   /* -------------------------------------------------- */
   return (
-    <div className="mx-auto mt-10 w-full max-w-2xl rounded-xl bg-white p-6 ">
+    <div className="mx-auto mt-6 w-full max-w-screen-md rounded-xl bg-white p-4 sm:p-6 md:p-8 shadow-sm">
+
       <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
         <NotebookPen className="h-5 w-5 text-blue-600" />
         Create a Class
@@ -338,7 +339,7 @@ export default function Classes() {
           >
             <EditorContent
               editor={editor}
-              className="min-h-[150px] cursor-text"
+              className="min-h-[150px] w-full cursor-text overflow-x-auto"
             />
           </div>
         </div>
@@ -376,7 +377,7 @@ export default function Classes() {
             <ClipboardList className="mr-1 inline h-4 w-4 text-blue-600" />
             Assignments
           </label>
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-2 flex flex-col sm:flex-row items-stretch gap-2">
             <input
               type="text"
               className="flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
@@ -410,7 +411,8 @@ export default function Classes() {
             <Paperclip className="mr-1 inline h-4 w-4 text-blue-600" />
             Attachments
           </label>
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-2 flex flex-col sm:flex-row items-stretch gap-2">
+
             <input
               type="text"
               className="flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
