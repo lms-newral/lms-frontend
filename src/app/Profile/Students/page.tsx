@@ -33,7 +33,7 @@ export default function EnrolledStudents() {
             headers: { Authorization: `Bearer ${user.accessToken}` },
           }
         );
-        setCourses(response.data);
+        setCourses(response.data.data);
       } catch (err) {
         console.error("Error fetching courses:", err);
         setError("Failed to load courses");
