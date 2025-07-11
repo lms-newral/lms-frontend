@@ -75,7 +75,7 @@ export default function Classes() {
           const res = await axios.get(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}course`
           );
-          setCourses(res.data);
+          setCourses(res.data.data);
           console.log(res.data);
         } catch {
           toast.error("Could not fetch courses");

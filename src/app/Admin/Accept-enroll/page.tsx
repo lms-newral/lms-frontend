@@ -90,7 +90,7 @@ export default function AcceptEnroll() {
           <p className="text-sm mt-2">Check back later for new requests</p>
         </div>
       ) : (
-        <div className="pt-10 min-h-screen w-full flex justify-centerr">
+        <div className="pt-10 min-h-screen w-full flex flex-col justify-centerr">
           {enrollmentRequests.map((request) => (
             <EnrollReqCard
               key={request.id}

@@ -10,6 +10,7 @@ import AppSidebar from "@/components/Sidebar/AppSidebar";
 import DashboardHeader from "@/components/Dashboard/DashboardHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { toast } from "sonner";
+import ProfileSidebar from "@/components/Profile/ProfileSidebar";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const path = usePathname();
@@ -100,6 +101,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <Header />
         {children}
         <Footer />
+      </>
+    );
+  }
+  if (path.startsWith("/Profile")) {
+    return (
+      <>
+        <ProfileSidebar />
+        {children}
       </>
     );
   }

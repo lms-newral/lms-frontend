@@ -29,8 +29,8 @@ export default function Dashboard() {
             headers: { Authorization: `Bearer ${user.accessToken}` },
           }
         );
-
-        setClasses(resp.data);
+        console.log(resp.data.data);
+        setClasses(resp.data.data);
       } catch (error: any) {
         toast.error(
           error.response.data.message || "No enrolled courses found "
