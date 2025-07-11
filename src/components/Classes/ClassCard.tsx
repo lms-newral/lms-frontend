@@ -1,12 +1,9 @@
 import { Classes } from "@/types/DataTypes";
 import { Users, Calendar, Clock, Play, ArrowBigRight } from "lucide-react";
 import Link from "next/link";
-interface ClassData extends Classes {
-  isClient: boolean;
-}
-export default function ClassCard(classItem: ClassData) {
+
+export default function ClassCard(classItem: Classes) {
   const formatDate = (dateString: string) => {
-    if (!classItem.isClient) return "";
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -15,7 +12,6 @@ export default function ClassCard(classItem: ClassData) {
   };
 
   const formatTime = (dateString: string) => {
-    if (!classItem.isClient) return "";
     return new Date(dateString).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -63,20 +59,20 @@ export default function ClassCard(classItem: ClassData) {
                 <Users className="w-4 h-4" />
                 <span>{data.attendanceCount}</span>
               </div>
-              {data.isClient && (
+              {
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
                   <span>{formatDate(data.createdAt)}</span>
                 </div>
-              )}
+              }
             </div>
 
-            {data.isClient && (
+            {
               <div className="flex items-center gap-1.5 text-xs text-slate-400">
                 <Clock className="w-3 h-3" />
                 <span>{formatTime(data.createdAt)}</span>
               </div>
-            )}
+            }
           </div>
         </Link>
 

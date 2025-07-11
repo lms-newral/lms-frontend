@@ -69,7 +69,7 @@ export default function ProfileDropdown({
 
         <DropdownMenuItem className="cursor-pointer group">
           <User className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-          <Link href="/profile" className="w-full">
+          <Link href="/Profile" className="w-full">
             Profile
           </Link>
         </DropdownMenuItem>
