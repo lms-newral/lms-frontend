@@ -55,7 +55,7 @@ export default function UserProfilePage() {
 
   const handleSave = () => {
     if (!currentUser) return;
-    setCurrentUser({ ...currentUser, ...editForm });
+    //setCurrentUser({ ...currentUser, ...editForm });
     setIsEditing(false);
   };
 
@@ -70,7 +70,7 @@ export default function UserProfilePage() {
     });
   };
 
-  const getRoleBadgeColor = (role) => {
+  const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "ADMIN":
         return "bg-red-100 text-red-800";
@@ -83,7 +83,7 @@ export default function UserProfilePage() {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -141,9 +141,9 @@ export default function UserProfilePage() {
                 )}
                 <div className="flex items-center space-x-2 mt-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(
-                      currentUser?.role
-                    )}`}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      currentUser?.role && getRoleBadgeColor(currentUser?.role)
+                    }`}
                   >
                     {currentUser?.role}
                   </span>
@@ -249,7 +249,7 @@ export default function UserProfilePage() {
               <div>
                 <p className="text-sm text-gray-500">Member Since</p>
                 <p className="text-gray-700">
-                  {formatDate(currentUser?.createdAt)}
+                  {formatDate(currentUser?.createdAt || "")}
                 </p>
               </div>
             </div>
@@ -313,7 +313,10 @@ export default function UserProfilePage() {
                   </h3>
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
-                      <span>Enrolled on {formatDate(course.enrolledAt)}</span>
+                      <span>
+                        Enrolled on{" "}
+                        {course.enrolledAt && formatDate(course.enrolledAt)}
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -399,7 +402,10 @@ export default function UserProfilePage() {
         </div>
 
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Last updated: {formatDate(currentUser?.updatedAt)}</p>
+          <p>
+            Last updated:{" "}
+            {currentUser?.updatedAt && formatDate(currentUser?.updatedAt)}
+          </p>
         </div>
       </div>
     </div>

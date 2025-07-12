@@ -1,15 +1,29 @@
 import { Search, X } from "lucide-react";
 import { useState } from "react";
 
+type EnrolledStudentsHeaderProps = {
+  onSearch?: (value: string) => void;
+  totalCount: number;
+  filteredCount?: number;
+};
+
 export default function EnrolledStudentsHeader({
   onSearch,
   totalCount,
   filteredCount,
-}) {
+}: EnrolledStudentsHeaderProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
+  interface SearchChangeEvent {
+    target: {
+      value: string;
+    };
+  }
+
+  const handleSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement> & SearchChangeEvent
+  ) => {
+    const value: string = e.target.value;
     setSearchTerm(value);
 
     // Call the onSearch callback if provided
