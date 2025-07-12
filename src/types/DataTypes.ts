@@ -7,11 +7,22 @@ export interface User {
   username: string;
   name: string;
   role: Role;
+  devices: Devices[];
+  deviceLimit: 2;
   createdCourses: Course[];
   enrolledCourses: CourseEnrollment[];
   createdClasses: Classes[];
   createdAt: string;
   updatedAt: string;
+}
+export interface Devices {
+  user: User;
+  userId: string;
+  osName: string;
+  browserName: string;
+  deviceIp: string;
+  refreshToken: string;
+  createdAt: string;
 }
 enum Role {
   STUDENT = "STUDENT",
@@ -98,4 +109,12 @@ export interface Classes {
   isActive: boolean;
   createdAt: string; //date and time
   updatedAt: string; //date and time
+}
+export interface PaginationData {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
 }

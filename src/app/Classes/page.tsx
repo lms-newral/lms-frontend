@@ -4,19 +4,10 @@ import { UserState } from "@/types/userstate";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
-import { Classes } from "@/types/DataTypes";
+import { Classes, PaginationData } from "@/types/DataTypes";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface PaginationData {
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  limit: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-}
 
 export default function Class() {
   const course = useSelector(
