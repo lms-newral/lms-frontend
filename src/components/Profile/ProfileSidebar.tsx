@@ -1,6 +1,5 @@
 "use client";
 import {
-  Home,
   MessageSquare,
   Menu,
   X,
@@ -13,9 +12,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { FaFirefoxBrowser } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { UserState } from "@/types/userstate";
 
-const navigationItems = [
-  { title: "Profile", icon: User, url: "/Profile" },
+const navigationItems = [{ title: "Profile", icon: User, url: "/Profile" }];
+const adminNavigationItems = [
   { title: "Enrolled Students", icon: AtSignIcon, url: "/Profile/Students" },
   { title: "Courses", icon: MessageSquare, url: "/Profile/Courses" },
   { title: "Admin Dashboard", icon: FaFirefoxBrowser, url: "/Profile/Dash" },
@@ -26,6 +27,7 @@ export default function ProfileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+  const user = useSelector((state: { user: UserState }) => state.user);
   const expanded = !isCollapsed || isHovering;
 
   return (
@@ -145,6 +147,47 @@ export default function ProfileSidebar() {
                 </Link>
               );
             })}
+
+            {user.user?.role !== "STUDENT" &&
+              user.user?.role !== "TEACHER" &&
+              adminNavigationItems.map((item) => {
+                return (
+                  <Link
+                    key={item.title}
+                    href={item.url}
+                    onClick={() => setIsOpen(false)}
+                    className={`
+                  flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                  ${
+                    pathname === item.url
+                      ? " text-black  "
+                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                  }
+                  ${isCollapsed ? "justify-center" : ""}
+                  group relative
+                `}
+                    title={isCollapsed ? item.title : ""}
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <span
+                      className={`font-medium truncate transition-all duration-300 ${
+                        isCollapsed
+                          ? "opacity-0 w-0 overflow-hidden"
+                          : "opacity-100"
+                      }`}
+                    >
+                      {item.title}
+                    </span>
+
+                    {/* Tooltip for collapsed state */}
+                    {isCollapsed && (
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                        {item.title}
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
           </nav>
         </div>
       </div>

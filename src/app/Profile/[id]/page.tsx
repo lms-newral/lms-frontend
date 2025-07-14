@@ -11,23 +11,23 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { User } from "@/types/DataTypes";
-import { useSelector } from "react-redux";
-import { UserState } from "@/types/userstate";
+import { useParams } from "next/navigation";
 
 export default function UserProfilePage() {
-  const user = useSelector((state: { user: UserState }) => state.user);
+  const param = useParams();
+  // Mock user data based on the User model
   const [currentUser, setCurrentUser] = useState<User>();
 
   useEffect(() => {
     async function getUserData() {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}user/${user.user?.id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}user/${param.id}`
       );
       console.log(response.data);
       setCurrentUser(response.data);
     }
     getUserData();
-  }, [user]);
+  }, [param]);
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {

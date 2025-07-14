@@ -13,6 +13,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { UserState } from "@/types/userstate";
 import { Course, CourseEnrollment, PaginationData } from "@/types/DataTypes";
+import Link from "next/link";
 
 export default function EnrolledStudents() {
   const [enrolledCourses, setEnrolledCourses] = useState<CourseEnrollment[]>(
@@ -368,74 +369,76 @@ export default function EnrolledStudents() {
                   if (!course.student) return null;
 
                   return (
-                    <div
+                    <Link
                       key={`${course.student.id}-${index}`}
-                      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+                      href={`/Profile/${course.studentId}`}
                     >
-                      <div className="flex items-center space-x-4">
-                        {/* Profile Image */}
-                        <div className="flex-shrink-0">
-                          <img
-                            src={
-                              course.student.profileImage ||
-                              "/default-avatar.png"
-                            }
-                            className="w-16 h-16 rounded-full object-cover border-3 border-gray-200 shadow-sm"
-                            alt={`${course.student.name}'s profile`}
-                            onError={(e) => {
-                              e.currentTarget.src = "/default-avatar.png";
-                            }}
-                          />
-                        </div>
-
-                        {/* Student Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="text-lg font-semibold text-gray-900 truncate">
-                              {course.student.name}
-                            </h3>
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {course.student.role}
-                            </span>
+                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+                        <div className="flex items-center space-x-4">
+                          {/* Profile Image */}
+                          <div className="flex-shrink-0">
+                            <img
+                              src={
+                                course.student.profileImage ||
+                                "/default-avatar.png"
+                              }
+                              className="w-16 h-16 rounded-full object-cover border-3 border-gray-200 shadow-sm"
+                              alt={`${course.student.name}'s profile`}
+                              onError={(e) => {
+                                e.currentTarget.src = "/default-avatar.png";
+                              }}
+                            />
                           </div>
-                          <p className="text-sm text-gray-500 mb-1">
-                            @{course.student.username}
-                          </p>
-                          <p className="text-sm text-gray-600 mb-2">
-                            {course.student.email}
-                          </p>
-                          <div className="flex items-center text-xs text-gray-500">
-                            <svg
-                              className="w-4 h-4 mr-1"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            Enrolled on {formatDate(course.enrolledAt || "")}
-                          </div>
-                        </div>
 
-                        {/* Action Menu */}
-                        <div className="flex-shrink-0">
-                          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                            <svg
-                              className="w-5 h-5"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                            </svg>
-                          </button>
+                          {/* Student Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <h3 className="text-lg font-semibold text-gray-900 truncate">
+                                {course.student.name}
+                              </h3>
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {course.student.role}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-500 mb-1">
+                              @{course.student.username}
+                            </p>
+                            <p className="text-sm text-gray-600 mb-2">
+                              {course.student.email}
+                            </p>
+                            <div className="flex items-center text-xs text-gray-500">
+                              <svg
+                                className="w-4 h-4 mr-1"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              Enrolled on {formatDate(course.enrolledAt || "")}
+                            </div>
+                          </div>
+
+                          {/* Action Menu */}
+                          <div className="flex-shrink-0">
+                            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                              <svg
+                                className="w-5 h-5"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

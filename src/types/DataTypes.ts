@@ -16,6 +16,7 @@ export interface User {
   updatedAt: string;
 }
 export interface Devices {
+  id: string;
   user: User;
   userId: string;
   osName: string;
@@ -31,6 +32,7 @@ enum Role {
   SUPER_ADMIN = "SUPER_ADMIN",
 }
 export interface CourseEnrollment {
+  id: string;
   student?: User;
   studentId?: string;
   course?: Course;
@@ -38,6 +40,19 @@ export interface CourseEnrollment {
   enrolledAt?: string; //Date and time
   completedAt?: string; //Date and time
   lastAccessedAt?: string; //Date and time
+}
+export interface CourseEnrollmentRequest {
+  id: string;
+  student?: User;
+  studentId?: string;
+  course?: Course;
+  courseId?: string;
+  status: RequestStatus;
+}
+enum RequestStatus {
+  PENDING = "PENDING",
+  REJECTED = "REJECTED",
+  ACCEPTED = "ACCEPTED",
 }
 export interface Course {
   id: string;
