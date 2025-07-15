@@ -47,9 +47,8 @@ export default function ProfileDropdown({
             />
           ) : null}
           <User
-            className={`h-5 w-5 text-white ${
-              user?.profileImage ? "hidden" : ""
-            }`}
+            className={`h-5 w-5 text-white ${user?.profileImage ? "hidden" : ""
+              }`}
             aria-hidden="true"
           />
         </button>
@@ -83,49 +82,50 @@ export default function ProfileDropdown({
         {(user?.role === "ADMIN" ||
           user?.role === "SUPER_ADMIN" ||
           user?.role === "TEACHER") && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer group">
-              <BellDotIcon className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <Link href="/Admin/Accept-enroll" className="w-full">
-                Enrollment Requests
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer group">
-              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <Link href="/Create/Class" className="w-full">
-                Create Class
-              </Link>
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer group">
+                <BellDotIcon className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <Link href="/Admin/Accept-enroll" className="w-full">
+                  Enrollment Requests
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer group">
+                <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <Link href="/Create/Class" className="w-full">
+                  Create Class
+                </Link>
+              </DropdownMenuItem>
 
-            <DropdownMenuItem className="cursor-pointer group">
-              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <Link href="/Create/Course" className="w-full">
-                Create Course
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer group">
-              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <Link href="/Create/Notes" className="w-full">
-                Add Notes to Class
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer group">
-              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <Link href="/Create/Notes" className="w-full">
-                Add Assignment to Class
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer group">
-              <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <Link href="/Create/Notes" className="w-full">
-                Add Attachment to Class
-              </Link>
-            </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer group">
+                <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <Link href="/Create/Course" className="w-full">
+                  Create Course
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer group">
+                <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <Link href="/Create/Notes" className="w-full">
+                  Add Notes to Class
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer group">
+                <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <Link href="/Create/Notes" className="w-full">
+                  Add Assignment to Class
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer group">
+                <PlusCircle className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <Link href="/Create/Notes" className="w-full">
+                  Add Attachment to Class
+                </Link>
+              </DropdownMenuItem>
 
-            <DropdownMenuSeparator />
-          </>
-        )}
+
+              <DropdownMenuSeparator />
+            </>
+          )}
 
         <DropdownMenuItem
           onClick={handleLogout}

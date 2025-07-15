@@ -42,6 +42,8 @@ export default function SigninForm() {
       const res = await axios.post(loginUrl, { email, password });
 
       localStorage.setItem("refreshToken", res.data.refreshToken);
+      console.log("refresh token", res.data.refreshToken);
+      console.log("access token", res.data.accessToken);
       dispatch(
         setUser({
           accessToken: res.data.accessToken,

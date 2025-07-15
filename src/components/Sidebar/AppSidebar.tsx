@@ -128,8 +128,8 @@ export default function AppSidebar() {
                   <item.icon className="h-5 w-5 flex-shrink-0" />
                   <span
                     className={`font-medium truncate transition-all duration-300 ${isCollapsed
-                        ? "opacity-0 w-0 overflow-hidden"
-                        : "opacity-100"
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100"
                       }`}
                   >
                     {item.title}

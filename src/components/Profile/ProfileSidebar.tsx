@@ -76,9 +76,8 @@ export default function ProfileSidebar() {
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <Link
             href={"/"}
-            className={`text-2xl font-bold text-gray-900 cursor-pointer transition-opacity duration-300 ${
-              isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
-            }`}
+            className={`text-2xl font-bold text-gray-900 cursor-pointer transition-opacity duration-300 ${isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+              }`}
           >
             lms.
           </Link>
@@ -117,11 +116,10 @@ export default function ProfileSidebar() {
                   onClick={() => setIsOpen(false)}
                   className={`
                   flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
-                  ${
-                    pathname === item.url
+                  ${pathname === item.url
                       ? " text-black  "
                       : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                  }
+                    }
                   ${isCollapsed ? "justify-center" : ""}
                   group relative
                 `}
@@ -129,11 +127,10 @@ export default function ProfileSidebar() {
                 >
                   <item.icon className="h-5 w-5 flex-shrink-0" />
                   <span
-                    className={`font-medium truncate transition-all duration-300 ${
-                      isCollapsed
+                    className={`font-medium truncate transition-all duration-300 ${isCollapsed
                         ? "opacity-0 w-0 overflow-hidden"
                         : "opacity-100"
-                    }`}
+                      }`}
                   >
                     {item.title}
                   </span>
@@ -158,11 +155,10 @@ export default function ProfileSidebar() {
                     onClick={() => setIsOpen(false)}
                     className={`
                   flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
-                  ${
-                    pathname === item.url
-                      ? " text-black  "
-                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                  }
+                  ${pathname === item.url
+                        ? " text-black  "
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                      }
                   ${isCollapsed ? "justify-center" : ""}
                   group relative
                 `}
@@ -170,11 +166,10 @@ export default function ProfileSidebar() {
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
                     <span
-                      className={`font-medium truncate transition-all duration-300 ${
-                        isCollapsed
+                      className={`font-medium truncate transition-all duration-300 ${isCollapsed
                           ? "opacity-0 w-0 overflow-hidden"
                           : "opacity-100"
-                      }`}
+                        }`}
                     >
                       {item.title}
                     </span>

@@ -82,7 +82,7 @@ export default function Classes() {
         }
       }
     }
-
+    console.log(user.accessToken);
     getCourses();
   }, [user, router]);
 
